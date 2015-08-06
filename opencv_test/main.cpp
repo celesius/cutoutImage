@@ -16,8 +16,9 @@
 #include <cmath>
 #include <opencv2/core/core_c.h>
 #include "LazySnapping.h"
+#include "cvRoundRectangle.h"
 
-using namespace std;
+//using namespace std;
 
 //struct myd//保存种子像素
 //{
@@ -88,92 +89,8 @@ using namespace std;
 //                seedS.push_back(temppoint);
 //            }
 //        }
-//    } 
+//    }
 //}
-struct Node
-{
-    int x;
-    int y;
-    Node* next;
-};
-
-void RegionGrow(const IplImage* src, IplImage* dst, int seedx, int seedy, int threshold, bool flag)
-{
-    if(!src || src->nChannels != 1)return ;
-    
-    int width = src->width;
-    int height = src->height;
-    int srcwidthstep = src->widthStep;
-    uchar* img = (uchar*)src->imageData;
-    
-    //dst是成长区域
-    cvZero(dst);
-    
-    //标记每个像素点是否被计算过
-    IplImage* M = cvCreateImage(cvSize(width, height), 8, 1);
-    int Mwidthstep = M->widthStep;
-    
-    cvZero(M);
-    M->imageData[seedy * Mwidthstep + seedx] = 1;    //种子点位置为1，其它位置为0
-    
-    CvScalar cur = CV_RGB(255,255,255);
-    cvSet2D(dst, seedy, seedx, cur);
-    
-    int start = 0;
-    int end = 1;
-    
-    Node *queue = new Node;
-    queue->x = seedx;
-    queue->y = seedy;
-    queue->next = NULL;
-    Node *first = queue;
-    Node *last = queue;
-    
-    while (end - start > 0)
-    {
-        int x = first->x;
-        int y = first->y;
-        uchar pixel = (uchar)img[y * srcwidthstep + x];
-        
-        for (int yy = -1; yy<=1; yy++)
-        {
-            for (int xx = -1; xx<=1; xx++)
-            {
-                if(flag)
-                    if ( abs(yy) && abs(xx))
-                        continue;
-                
-                int cx = x + xx;
-                int cy = y + yy;
-                if (cx >= 0 && cx <width && cy >=0 && cy < height)
-                {
-                    if (abs(img[cy * srcwidthstep + cx] - pixel) <= threshold &&
-                        M->imageData[cy * Mwidthstep + cx] != 1)
-                    {
-                        Node *node = new Node;
-                        node->x = cx;
-                        node->y = cy;
-                        node->next = NULL;
-                        
-                        end++;
-                        last->next = node;
-                        last = node;
-                        
-                        M->imageData[cy * Mwidthstep + cx] = 1;
-                        
-                        cvSet2D(dst, cy, cx, cur);
-                    }
-                }
-            }
-        }
-        Node* temp = first; 
-        first = first->next; 
-        delete temp; 
-        start++; 
-    } 
-    
-    cvReleaseImage(&M); 
-} 
 //鼠标指令，为了便于测试
 
 bool regionGrowClover(  cv::Mat const srcMat, cv::Mat &dstMat, int initSeedx, int initSeedy, int threshold) //4邻域生长灰度图生长
@@ -247,12 +164,12 @@ bool regionGrowClover(  cv::Mat const srcMat, cv::Mat &dstMat, int initSeedx, in
                     dstMat.ptr<uchar>(y+1)[x] = 255;
                     seedVector.push_back(cv::Point(x,y+1));
                 }
-            
+                
             }
         }
         
     }
-
+    
     return rState;
 }
 
@@ -278,18 +195,12 @@ void on_mouse( int event, int x, int y, int flags, void* param)
          *开始生长算法
          */
         regionGrowClover(receiveMat,growDstMat,x,y,3);
-        
-        
         cv::Mat static receiveMatClone = receiveMat.clone();
         cv::circle(receiveMatClone, cv::Point(x,y), 2, cv::Scalar(255));
         cv::putText(receiveMatClone, pixelCoordText, cv::Point(x,y), CV_FONT_HERSHEY_SIMPLEX, 0.25, cv::Scalar(100));
         cv::imshow("orgGray", receiveMatClone);
-        
-        
         //RegionGrow(&growSrcIpl, &growDstIpl, x, y,10, 1);
         cv::imshow("mouseGrow", growDstMat);
-        
-        
     }
 }
 
@@ -344,11 +255,11 @@ void rectRegionGrow( std::vector<cv::Point> seedVector, cv::Point rectMatOrg, co
         int seedy = seedVector[i].y - rectMatOrg.y;
         regionGrowClover(srcMat, dstMat, seedx, seedy, 5);
     }
-
+    
 }
 
-vector<CvPoint> forePts;
-vector<CvPoint> backPts;
+std::vector<CvPoint> forePts;
+std::vector<CvPoint> backPts;
 const int SCALE = 4;
 //IplImage* image = NULL;
 char winName[] = "lazySnapping";
@@ -454,27 +365,31 @@ void mergeProcess(const cv::Mat srcImg,cv::Mat &dstImg)
     cv::Mat a_mat = srcImg.clone();
     cv::Mat showContours = cv::Mat(a_mat.rows,a_mat.cols,CV_8UC1,cv::Scalar(0));
     //cv::Mat showContours = cv::Mat(srcImg.rows,srcImg.cols,CV_8UC4,cv::Scalar(0,0,0,0));
-   // cv::Mat
-   
+    // cv::Mat
+    
     std::vector<std::vector<cv::Point>> contours;
     std::vector<std::vector<cv::Point>> hiararchy;
     
     cv::findContours(a_mat, contours, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_NONE);
     cv::drawContours(showContours, contours, -1, cv::Scalar(255),CV_FILLED);
-
+    
     //cv::imshow("contours", showContours);
     
     cv::Mat closeMat;
     
-    cv::morphologyEx(showContours, closeMat, cv::MORPH_CLOSE, cv::Mat(10,10,CV_8U),cv::Point(-1,-1),1);
-//    cv::imshow("closeMat", closeMat);
+    cv::morphologyEx(showContours, closeMat, cv::MORPH_CLOSE, cv::Mat(11,11,CV_8U),cv::Point(-1,-1),1);
+    cv::imshow("closeMat", closeMat);
     
-    cv::medianBlur(closeMat, closeMat,5);
+    //cv::medianBlur(closeMat, closeMat,5);
+    
     //因为膨胀和腐蚀带来了一些"孤岛"(断裂的色块)，所以要再做一次背景块去除
     cv::Mat dbCloseMat;
     deleteBlackIsland(closeMat,dbCloseMat);
-//    cv::imshow("dbCloseMat", dbCloseMat);
-//    cv::imshow("medianBlurCloseMat", closeMat);
+    cv::medianBlur(dbCloseMat, dbCloseMat,5); //后作中值滤波
+    
+    cv::dilate(dbCloseMat, dbCloseMat, cv::Mat());
+    //    cv::imshow("dbCloseMat", dbCloseMat);
+    //    cv::imshow("medianBlurCloseMat", closeMat);
     dstImg = dbCloseMat;
 }
 
@@ -515,11 +430,20 @@ void colorDispResult(const cv::Mat picMat, cv::Mat cutPicBitMat, cv::Point cutPi
     }
     cv::imshow("colorCutPicRows", colorCutPic);
     cv::imshow("showMatColor",showMat);
- 
-    
-    
+}
 
-
+void storeSeed(cv::Mat &storeSeedMat,cv::Mat currentSeedMat,cv::Point cseedMatAnchorPoint)
+{
+    int cSeedMatRows = currentSeedMat.rows;
+    int cSeedMatCols = currentSeedMat.cols;
+    
+    for(int y = 0;y<cSeedMatRows;y++){
+        uchar *csMatRowData = currentSeedMat.ptr<uchar>(y);
+        uchar *ssMatRowData = storeSeedMat.ptr<uchar>(y + cseedMatAnchorPoint.y);
+        for (int x = 0; x<cSeedMatCols; x++) {
+            ssMatRowData[x+cseedMatAnchorPoint.x] = csMatRowData[x];
+        }
+    }
 }
 
 //这个用于测试局部算法
@@ -530,6 +454,9 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
     cv::Mat showMat = cv::Mat((IplImage *)param,true);
     cv::Mat showMatClone = showMat.clone(); //用于画点，画线显示用
     cv::Mat showMergeColorImg = showMat.clone();
+    
+    static cv::Mat seedStoreMat = cv::Mat(showMat.rows,showMat.cols,CV_8UC1,cv::Scalar(0));
+    
     forePts.clear();
     
     std::vector<cv::Point> static mouseSlideRegion; //鼠标按下滑动区域
@@ -537,14 +464,17 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
     if(event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_LBUTTON)){  //按下左键并移动
         mouseSlideRegion.push_back(cv::Point(x,y));
         
-        //if(x!=0)
-            mouseSlideRegion.push_back(cv::Point(x - 10,y));
-        //else if(x!= (showMat.cols-1))
-            mouseSlideRegion.push_back(cv::Point(x + 10,y));
+        mouseSlideRegion.push_back(cv::Point(x - 3,y));
+        mouseSlideRegion.push_back(cv::Point(x + 3,y));
+        mouseSlideRegion.push_back(cv::Point(x - 6,y));
+        mouseSlideRegion.push_back(cv::Point(x + 6,y));
+        mouseSlideRegion.push_back(cv::Point(x,y - 3));
+        mouseSlideRegion.push_back(cv::Point(x,y + 3));
+        mouseSlideRegion.push_back(cv::Point(x,y - 6));
+        mouseSlideRegion.push_back(cv::Point(x,y + 6));
+        //7*7种子点
         
         //这里不安全
-        
-        
     }
     else if(event == CV_EVENT_LBUTTONUP){
         int lx = showMat.cols,rx = 0,ty = showMat.rows,by = 0;
@@ -552,19 +482,15 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         {
             std::cout<<"point  = "<< mouseSlideRegion[i]<<std::endl;
             cv::circle(showMatClone, mouseSlideRegion[i], 3, cv::Scalar(255)); //绘制现实点
-            
-             //最左面点x，最右面点x，最上面点y,最下面点y
-            
+            //最左面点x，最右面点x，最上面点y,最下面点y
             if(mouseSlideRegion[i].x < lx)
             {
                 lx = mouseSlideRegion[i].x;
             }
-            
             if(mouseSlideRegion[i].x > rx)
             {
                 rx = mouseSlideRegion[i].x;
             }
-            
             if(mouseSlideRegion[i].y <ty )
             {
                 ty = mouseSlideRegion[i].y;
@@ -573,8 +499,6 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
                 by = mouseSlideRegion[i].y;
             }
             //CvPoint forePtsCvPoint =
-            
-            
         }
         std::cout<<" lx " << lx << " rx " << rx << " ty " << ty << " by " << by <<std::endl;
         
@@ -582,10 +506,14 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         cv::Point rtP = cv::Point(rx,ty);
         cv::Point lbP = cv::Point(lx,by);
         cv::Point rbP = cv::Point(rx,by);
-                //要截取的图形
+        //要截取的图形
         int rectMatRow = by - ty + 1;
         int rectMatCol = rx - lx + 1;
         cv::Mat recMat = cv::Mat (rectMatRow,rectMatCol,CV_8UC1,cv::Scalar(0));
+        cv::Mat recRoundMat = cv::Mat (rectMatRow,rectMatCol,CV_8UC1,cv::Scalar(0)); //圆角矩形
+        cvRoundRectangle(recRoundMat, cv::Point(0,0), cv::Point(rectMatCol-1,rectMatRow-1),20,cv::Scalar(255),1, 8, 0); //圆角矩形
+        cv::imshow("recRoundMat", recRoundMat);
+        
         cv::rectangle(showMatClone, ltP, rbP, cv::Scalar(255),1); //画图形
         
         for(int y = 0;y<rectMatRow;y++){
@@ -610,6 +538,9 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         cv::Mat mergeMat;
         mergeProcess(regionGrowMat,mergeMat);
         cv::imshow("mergeMat", mergeMat);
+        storeSeed(seedStoreMat,mergeMat,ltP);
+        cv::imshow("seedStoreMat", seedStoreMat);
+        
         //rectLazySnapping(mouseSlideRegion, ltP, nextImg, regionGrowMat);
         //cannyAndShow(filterImg);
         //cv::imshow("recMat", recMat);
@@ -623,12 +554,12 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         //cv::adaptiveThreshold(filterImg, bitMat, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY_INV, blockSize, constValue);
         //cv::imshow("bitMatFilter", bitMat);
         
-
+        
         mouseSlideRegion.clear();
         std::cout<<"CV_EVENT_LBUTTONUP" <<std::endl;
     }
-
-
+    
+    
 }
 
 void on_mouse_cube_color( int event, int x, int y, int flags, void* param)
@@ -699,16 +630,61 @@ void on_mouse_cube_color( int event, int x, int y, int flags, void* param)
         cv::imshow("showMat", showMatClone);
         cv::imshow("regionLazySnappingMat", regionLazySnappingMat);
         mouseSlideRegion.clear();
+    }
+}
 
+void on_mouse_roundRectangle(int event, int x, int y, int flags, void* param) //测试圆角
+{
+    cv::Mat showMat = cv::Mat((IplImage *)param,true);
+    std::vector<cv::Point> static mouseSlideRegion;
+    
+    if(event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_LBUTTON)){
+        mouseSlideRegion.push_back(cv::Point(x,y));
+    }
+    else if(event == CV_EVENT_LBUTTONUP){
+        int lx = showMat.cols,rx = 0,ty = showMat.rows,by = 0;
+        for(int i = 0;i<(int)mouseSlideRegion.size();i++)
+        {
+            std::cout<<"point  = "<< mouseSlideRegion[i]<<std::endl;
+            cv::circle(showMat, mouseSlideRegion[i], 3, cv::Scalar(255)); //绘制现实点
+            
+            //最左面点x，最右面点x，最上面点y,最下面点y
+            
+            if(mouseSlideRegion[i].x < lx)
+            {
+                lx = mouseSlideRegion[i].x;
+            }
+            
+            if(mouseSlideRegion[i].x > rx)
+            {
+                rx = mouseSlideRegion[i].x;
+            }
+            
+            if(mouseSlideRegion[i].y <ty )
+            {
+                ty = mouseSlideRegion[i].y;
+            }
+            if(mouseSlideRegion[i].y > by){
+                by = mouseSlideRegion[i].y;
+            }
+            //CvPoint forePtsCvPoint =
+        }
+        cv::Point ltP = cv::Point(lx,ty);
+        cv::Point rtP = cv::Point(rx,ty);
+        cv::Point lbP = cv::Point(lx,by);
+        cv::Point rbP = cv::Point(rx,by);
+        
+        cvRoundRectangle(showMat, ltP, rbP,20,cv::Scalar(255),1, 8, 0);
+        cv::imshow("showMat", showMat);
+        mouseSlideRegion.clear();
     }
     
-
 }
 
 int main(int argc, char** argv){
     
     cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/2.jpg");
-   // cv::imshow("org", img);
+    // cv::imshow("org", img);
     cv::Mat dst = cv::Mat(img.rows,img.cols,CV_8UC1,cv::Scalar(0));
     cv::Mat grayImg;
     cv::cvtColor(img, grayImg, CV_BGR2GRAY);
@@ -717,11 +693,11 @@ int main(int argc, char** argv){
     //RegionGrow(&iplGray,&iplDst,500,500,7,1);
     
     //dst = iplDst;
-   // cv::imshow("orgGray", grayImg);
-   // cv::imshow("dst", dst);
-//    IplImage *psend2OnMouse;
-//    IplImage send2OnMouse = grayImg;
-   // psend2OnMouse = &send2OnMouse;
+    // cv::imshow("orgGray", grayImg);
+    // cv::imshow("dst", dst);
+    //    IplImage *psend2OnMouse;
+    //    IplImage send2OnMouse = grayImg;
+    // psend2OnMouse = &send2OnMouse;
     
     
     /*
@@ -737,11 +713,13 @@ int main(int argc, char** argv){
     cv::imshow("orgGray", growSrc);
     
     //cannyAndShow(grayImg);
-
+    
     
     //cvSetMouseCallback( "orgGray", on_mouse_cube_color, (void *)psend2OnMouse);
     cvSetMouseCallback( "orgGray", on_mouse_cube, (void *)psend2OnMouse);
-
+    //cvSetMouseCallback( "orgGray", on_mouse_roundRectangle, (void *)psend2OnMouse);
+    
+    
     
     int key = cv::waitKey(0);
     return 0;

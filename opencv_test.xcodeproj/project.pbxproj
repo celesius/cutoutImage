@@ -29,6 +29,7 @@
 		54F3B1881B71C64A00CADB23 /* libopencv_superres.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F3B1761B71C64A00CADB23 /* libopencv_superres.2.4.9.dylib */; };
 		54F3B1891B71C64A00CADB23 /* libopencv_video.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F3B1771B71C64A00CADB23 /* libopencv_video.2.4.9.dylib */; };
 		54F3B18A1B71C64A00CADB23 /* libopencv_videostab.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F3B1781B71C64A00CADB23 /* libopencv_videostab.2.4.9.dylib */; };
+		54F3B18D1B7334FE00CADB23 /* cvRoundRectangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54F3B18B1B7334FE00CADB23 /* cvRoundRectangle.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -73,6 +74,8 @@
 		54F3B1761B71C64A00CADB23 /* libopencv_superres.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_superres.2.4.9.dylib; path = ../../../../../usr/local/lib/libopencv_superres.2.4.9.dylib; sourceTree = "<group>"; };
 		54F3B1771B71C64A00CADB23 /* libopencv_video.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_video.2.4.9.dylib; path = ../../../../../usr/local/lib/libopencv_video.2.4.9.dylib; sourceTree = "<group>"; };
 		54F3B1781B71C64A00CADB23 /* libopencv_videostab.2.4.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_videostab.2.4.9.dylib; path = ../../../../../usr/local/lib/libopencv_videostab.2.4.9.dylib; sourceTree = "<group>"; };
+		54F3B18B1B7334FE00CADB23 /* cvRoundRectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cvRoundRectangle.cpp; sourceTree = "<group>"; };
+		54F3B18C1B7334FE00CADB23 /* cvRoundRectangle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cvRoundRectangle.h; sourceTree = "<group>"; };
 		5CD6ACAC1A0395120076F2B5 /* opencv_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = opencv_test; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -153,6 +156,8 @@
 				54F3B1181B70A6B400CADB23 /* LazySnapping.h */,
 				5471C03C1B5E37BA00504A37 /* maxflow-v3.01 */,
 				54F3AE431B6B867000CADB23 /* main.cpp */,
+				54F3B18B1B7334FE00CADB23 /* cvRoundRectangle.cpp */,
+				54F3B18C1B7334FE00CADB23 /* cvRoundRectangle.h */,
 			);
 			path = opencv_test;
 			sourceTree = "<group>";
@@ -242,6 +247,7 @@
 				54F3B1191B70A6B400CADB23 /* LazySnapping.cpp in Sources */,
 				5471C0451B5E392400504A37 /* maxflow.cpp in Sources */,
 				54F3AE451B6B867000CADB23 /* main.cpp in Sources */,
+				54F3B18D1B7334FE00CADB23 /* cvRoundRectangle.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
