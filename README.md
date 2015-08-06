@@ -1,0 +1,2 @@
+# cutoutImage
+在mac上利用opencv完成抠图功能的算法代码
