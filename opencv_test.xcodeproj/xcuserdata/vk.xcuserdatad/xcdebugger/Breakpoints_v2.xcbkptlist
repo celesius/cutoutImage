@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "460637352.685248"
+            timestampString = "460867888.007328"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1264"
-            endingLineNumber = "1264">
+            startingLineNumber = "1224"
+            endingLineNumber = "1224">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -40,11 +40,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "460637352.685248"
+            timestampString = "460867888.007328"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1332"
-            endingLineNumber = "1332">
+            startingLineNumber = "1292"
+            endingLineNumber = "1292">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -54,7 +54,21 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "460637352.685248"
+            timestampString = "460867888.007328"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1303"
+            endingLineNumber = "1303">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "opencv_test/main.cpp"
+            timestampString = "460867888.007328"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1343"
@@ -68,11 +82,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "460637352.685248"
+            timestampString = "460867888.007328"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1383"
-            endingLineNumber = "1383">
+            startingLineNumber = "1368"
+            endingLineNumber = "1368">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -82,25 +96,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "460637352.685248"
+            timestampString = "460867888.007328"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1408"
-            endingLineNumber = "1408">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "opencv_test/main.cpp"
-            timestampString = "460637352.685248"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1409"
-            endingLineNumber = "1409">
+            startingLineNumber = "1369"
+            endingLineNumber = "1369">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -174,11 +174,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "460637352.685248"
+            timestampString = "460867888.007328"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "803"
-            endingLineNumber = "803"
+            startingLineNumber = "767"
+            endingLineNumber = "767"
             landmarkName = "on_mouse_cube( int event, int x, int y, int flags, void* param)"
             landmarkType = "7">
          </BreakpointContent>
