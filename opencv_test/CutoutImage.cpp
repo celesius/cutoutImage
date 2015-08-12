@@ -19,7 +19,7 @@ CutoutImage::~CutoutImage()
 
 }
 
-void CutoutImage::processImageCreatMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat ,int lineWidth)
+void CutoutImage::processImageCreatMask( std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat, int lineWidth, int expandWidth )
 {
     cv::Mat showMat = srcMat.clone();
     cv::Mat showMergeColorImg = srcMat.clone();
@@ -56,6 +56,21 @@ void CutoutImage::processImageCreatMask(std::vector<cv::Point> mouseSlideRegionD
     }
     std::cout<<" lx " << lx << " rx " << rx << " ty " << ty << " by " << by <<std::endl;
     std::cout<<" orgMat cols " <<showMat.cols<< "orgMat rows " << showMat.rows <<std::endl;
+    
+    if( lx - expandWidth >= 0 )
+        lx = lx - expandWidth;
+  
+    if( rx + expandWidth <= showMat.cols - 1 )
+        rx = rx + expandWidth;
+   
+    if( ty - expandWidth >= 0)
+        ty = ty - expandWidth;
+    
+    if( by + expandWidth <= showMat.rows - 1 )
+        by = by + expandWidth;
+
+    std::cout<<" lx " << lx << " rx " << rx << " ty " << ty << " by " << by <<std::endl;
+    
     cv::Point ltP = cv::Point(lx,ty);
     cv::Point rtP = cv::Point(rx,ty);
     cv::Point lbP = cv::Point(lx,by);
@@ -96,6 +111,21 @@ void CutoutImage::processImageCreatMask(std::vector<cv::Point> mouseSlideRegionD
     cv::imshow("seedStoreMat", seedStoreMat);
     //cv::imshow("showMat", showMatClone);
     cv::Mat colorMergeMat;
+    CutoutImage::colorDispResultWithFullSeedMat(showMergeColorImg,seedStoreMat);
+
+}
+
+void CutoutImage::processImageDeleteMask(std::vector<cv::Point> mouseSlideRegionDiscrete , cv::Mat &seedStoreMat ,  const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth )
+{
+    cv::Mat deleteMat;
+    cv::Mat showMergeColorImg = srcMat.clone();
+    
+    cv::Size matSize = *new cv::Size;
+    matSize.width = showMergeColorImg.cols;
+    matSize.height = showMergeColorImg.rows;
+    
+    CutoutImage::deleteMatCreat(mouseSlideRegionDiscrete,matSize,lineWidth,deleteMat);
+    CutoutImage::deleteMask(deleteMat,seedStoreMat);
     CutoutImage::colorDispResultWithFullSeedMat(showMergeColorImg,seedStoreMat);
 
 }

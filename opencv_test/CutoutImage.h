@@ -16,12 +16,11 @@ class CutoutImage{
 public:
     CutoutImage();
     ~CutoutImage();
+    void processImageCreatMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth, int expandWidth );  //最后一个参数用于将生成的矩形向外扩展一些
+    void processImageDeleteMask(std::vector<cv::Point> mouseSlideRegionDiscrete , cv::Mat &seedStoreMat,const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth );//seedmat将被修改，因为删除了部分内容
     
-    void processImageCreatMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth );
+    void colorDispResultWithFullSeedMat( const cv::Mat picMat, const cv::Mat seedMat ); //需要这个函数用于外部debug
     void rotateMat (const cv::Mat srcMat ,cv::Mat &dstMat,const cv::Mat colorMat);
-    void deleteMatCreat(std::vector<cv::Point> inPoint,cv::Size matSize, int lineWide ,cv::Mat &dstMat);
-    void deleteMask(const cv::Mat deleteMat,cv::Mat &seedMat);
-    void colorDispResultWithFullSeedMat(const cv::Mat picMat,const cv::Mat seedMat );
     cv::Mat getMergeResult();
     
 public:
@@ -30,6 +29,10 @@ public:
     
 private:
     std::vector<cv::Point> mouseSlideRegion; //鼠标按下滑动区域
+    //删除mark需要的函数
+    void deleteMatCreat(std::vector<cv::Point> inPoint,cv::Size matSize, int lineWide ,cv::Mat &dstMat);
+    void deleteMask(const cv::Mat deleteMat,cv::Mat &seedMat);
+    //建立mark需要的函数
     bool regionGrowClover( const cv::Mat srcMat ,cv::Mat &dstMat, int initSeedx, int initSeedy, int threshold);
     bool regionGrowClover( const cv::Mat srcMat, const cv::Mat seedStoreMat ,cv::Mat &dstMat, int initSeedx, int initSeedy, int threshold);
     void drawLineAndMakePointSet(std::vector<cv::Point> inPoint,cv::Size matSize,int lineWide,std::vector<cv::Point> &pointSet);

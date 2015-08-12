@@ -26,7 +26,8 @@ CutoutImage *cutoutImage;
 int mousePointWidth = 0;
 int selectSeedMat = 0;
 std::vector<cv::Mat> seedMatVector;
-
+int maxSelectSeedMat = 0;
+cv::Mat seedStoreMat;
 
 //这个用于测试生长算法
 //void on_mouse( int event, int x, int y, int flags, void* param)
@@ -129,7 +130,6 @@ void rectLazySnapping( std::vector<cv::Point> seedVector, cv::Point rectMatOrg, 
 {
     int matRow = srcMat.rows;
     int matCol = srcMat.cols;
-    
     //dstMat = cv::Mat(matRow,matCol,CV_8UC1,cv::Scalar(0));
     forePts.clear();
     for(int i = 0;i<seedVector.size();i++){
@@ -154,26 +154,20 @@ void cannyAndShow(const cv::Mat matWillShow)
     cv::imshow("cannyDst", cannyDst);
 }
 
-
-
 //这个用于测试局部算法
 void on_mouse_cube( int event, int x, int y, int flags, void* param)
 {
     //首先要记录滑动区域并统计计算窗口大小
     cv::Mat showMat = cv::Mat((IplImage *)param,true);
     cv::Mat showMatClone = showMat.clone(); //用于画点，画线显示用
-    cv::Mat showMergeColorImg = showMat.clone();
+    //cv::Mat showMergeColorImg = showMat.clone();
     cv::Mat shoMatMouse = showMat.clone();
-    
-    static cv::Mat seedStoreMat = cv::Mat(showMat.rows,showMat.cols,CV_8UC1,cv::Scalar(0));
-   
+    //static cv::Mat seedStoreMat = cv::Mat( showMat.rows, showMat.cols, CV_8UC1, cv::Scalar(0) );
     //static cv::Mat allShow ;//= showMat.clone();
     forePts.clear();
     std::vector<cv::Point> static mouseSlideRegionDiscrete;
-    
     cv::circle(shoMatMouse, cv::Point(x,y), mousePointWidth/2, cv::Scalar(0));
     //cv::imshow("shoMatMouse", shoMatMouse);
-    
     //std::vector<cv::Point> static mouseSlideRegion; //鼠标按下滑动区域
     if(event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_LBUTTON)){  //按下左键并移动
         //if(event == (CV_EVENT_MOUSEMOVE && CV_EVENT_FLAG_LBUTTON)){
@@ -190,38 +184,32 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         if((int)seedMatVector.size() != 0){ //为0是最开始
             cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
             cv::imshow("sendSeedStoreMat", sendSeedStoreMat);
-            cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, sendSeedStoreMat,mousePointWidth);
+            cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, sendSeedStoreMat,mousePointWidth,10);
             seedStoreMat = sendSeedStoreMat;
         }
         else{
-            cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, seedStoreMat,mousePointWidth);
+            cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, seedStoreMat,mousePointWidth,10);
         }
         //这里要存储
-        
         cv::Mat matWillSave = seedStoreMat.clone();
-        
         //首先要删除selectSeedMat以后的内容，因为可能返回或者前进
         if((int)seedMatVector.size() != 0)
         {
             for(;;){
-                if( selectSeedMat + 1 == (int)seedMatVector.size() )
-                {
+                if( selectSeedMat + 1 == (int)seedMatVector.size() ){
                     break;
                 }
                 else{
                     seedMatVector.pop_back();
                 }
-                
             }
         }
         seedMatVector.push_back(matWillSave);
-        
         int vCnt = (int)seedMatVector.size();
-        if( vCnt == 6 ) //保证只有5个
+        if( vCnt ==  maxSelectSeedMat + 1) //保证只有5个
         {
             seedMatVector.erase(seedMatVector.begin()); //删除最开始的mat
         }
-        
         selectSeedMat = (int)seedMatVector.size() - 1; //只要有修改就将selectSeedMat放到修改位置
         
         //cv::Mat allShow = cutoutImage->getMergeResult();
@@ -238,25 +226,33 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         mouseSlideRegionDiscrete.push_back(cv::Point(x,y));
     }
     else if(event == CV_EVENT_RBUTTONUP){   //右键抬起
-        cv::Size matSize = *new cv::Size;
-        matSize.width = showMat.cols;
-        matSize.height = showMat.rows;
-        cv::Mat deleteMat;
-        seedStoreMat = seedMatVector[selectSeedMat];
-        cutoutImage->deleteMatCreat(mouseSlideRegionDiscrete,matSize,mousePointWidth,deleteMat);
-        cutoutImage->deleteMask(deleteMat,seedStoreMat);
-        cutoutImage->colorDispResultWithFullSeedMat(showMergeColorImg,seedStoreMat);
-        //cv::Mat allShow = cutoutImage->getMergeResult();
-        seedMatVector.push_back(seedStoreMat);
-        int vCnt = (int)seedMatVector.size();
-        if( vCnt == 6 ) //保证只有5个
-        {
-            seedMatVector.erase(seedMatVector.begin());
+        
+        if((int)seedMatVector.size() != 0){
+            seedStoreMat = seedMatVector[selectSeedMat].clone();
+        }
+        else{
+            seedStoreMat = cv::Mat(showMat.rows,showMat.cols,CV_8UC1,cv::Scalar(0));
         }
         
-//        cv::imshow("orgGray", allShow);
-//        cv::imshow("deleteMat", deleteMat);
+        cv::Mat emptyMat;
+        cutoutImage->processImageDeleteMask(mouseSlideRegionDiscrete,seedStoreMat,showMat,emptyMat,mousePointWidth);
+        
+        if((int)seedMatVector.size() != 0)  //若已经生成过计算结果
+        {
+            cv::Mat matWillBeStore = seedStoreMat.clone();
+            seedMatVector.push_back(matWillBeStore);
+            int vCnt = (int)seedMatVector.size();
+            if( vCnt == maxSelectSeedMat + 1 ) //保证只有设置的最大数量
+            {
+                seedMatVector.erase(seedMatVector.begin());
+            }
+            selectSeedMat = (int)seedMatVector.size() - 1;
+        }
+        //        cv::imshow("orgGray", allShow);
+        //        cv::imshow("deleteMat", deleteMat);
         mouseSlideRegionDiscrete.clear();
+        std::cout<<"CV_EVENT_RBUTTONUP" <<std::endl;
+        std::cout<<" selectSeedMat =  " << selectSeedMat << std::endl;
     }
 }
 
@@ -343,19 +339,15 @@ void on_mouse_roundRectangle(int event, int x, int y, int flags, void* param) //
         {
             std::cout<<"point  = "<< mouseSlideRegion[i]<<std::endl;
             cv::circle(showMat, mouseSlideRegion[i], 3, cv::Scalar(255)); //绘制现实点
-            
             //最左面点x，最右面点x，最上面点y,最下面点y
-            
             if(mouseSlideRegion[i].x < lx)
             {
                 lx = mouseSlideRegion[i].x;
             }
-            
             if(mouseSlideRegion[i].x > rx)
             {
                 rx = mouseSlideRegion[i].x;
             }
-            
             if(mouseSlideRegion[i].y <ty )
             {
                 ty = mouseSlideRegion[i].y;
@@ -376,29 +368,29 @@ void on_mouse_roundRectangle(int event, int x, int y, int flags, void* param) //
     }
 }
 
-int main(int argc, char** argv){
-    
-    cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/2.jpg");
+void initSeedMatVector(cv::Size matSize)
+{
+    seedMatVector.clear();
+    cv::Mat initZeroMat = cv::Mat(matSize.height,matSize.width,CV_8UC1,cv::Scalar(0));
+    seedMatVector.push_back(initZeroMat);
+}
+
+int main(int argc, char** argv)
+{
+    cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/4.jpg");
     // cv::imshow("org", img);
     cv::Mat dst = cv::Mat(img.rows,img.cols,CV_8UC1,cv::Scalar(0));
     cv::Mat grayImg;
     cv::cvtColor(img, grayImg, CV_BGR2GRAY);
-    IplImage iplGray = grayImg;
-    IplImage iplDst = dst;
-    int maxSelectSeedMat = 5;
+    maxSelectSeedMat = 20;
     mousePointWidth = 10;
-    
     cutoutImage = new CutoutImage;
-    
-    //RegionGrow(&iplGray,&iplDst,500,500,7,1);
-    
-    //dst = iplDst;
-    // cv::imshow("orgGray", grayImg);
-    // cv::imshow("dst", dst);
-    //    IplImage *psend2OnMouse;
-    //    IplImage send2OnMouse = grayImg;
-    // psend2OnMouse = &send2OnMouse;
-    
+    //初始化seedMatVector;
+    cv::Size aSize;
+    aSize.width = img.cols;
+    aSize.height = img.rows;
+    initSeedMatVector(aSize);
+    seedStoreMat = cv::Mat( img.rows, img.cols, CV_8UC1, cv::Scalar(0) );
     /*
      *测试生长算法
      */
@@ -410,36 +402,40 @@ int main(int argc, char** argv){
     psend2OnMouse = &send2OnMouse;
     //send2OnMouse= IplImage(grayImg);
     cv::imshow("orgGray", growSrc);
-    
     //cannyAndShow(grayImg);
-    
-    
     //cvSetMouseCallback( "orgGray", on_mouse_cube_color, (void *)psend2OnMouse);
     cvSetMouseCallback( "orgGray", on_mouse_cube, (void *)psend2OnMouse);
     //cvSetMouseCallback( "orgGray", on_mouse_roundRectangle, (void *)psend2OnMouse);
-    
     cv::Mat mainMat;
-    
-    while (1) {
+    while (1)
+    {
         int key = cv::waitKey(2);
         if(key =='b') //回退
         {
-            if((int)seedMatVector.size() != 0 && selectSeedMat != 0)
+            if((int)seedMatVector.size() != 0 && selectSeedMat != 0)  //
             {
                 selectSeedMat --;
                 cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
             }
-            
+            std::cout<<"key BB selectSeedMat = " << selectSeedMat <<std::endl;
         }
         else if(key == 'r') //重做
         {
+            selectSeedMat = 0;
+            initSeedMatVector(aSize);
+            seedStoreMat = cv::Mat( img.rows, img.cols, CV_8UC1, cv::Scalar(0) );
+            cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
             
         }
         else if(key == 'f') //前进
         {
-            if((int)seedMatVector.size() != maxSelectSeedMat)
+            if( selectSeedMat !=  maxSelectSeedMat - 1 && selectSeedMat != seedMatVector.size() - 1 ){
                 selectSeedMat ++;
+                cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
+            }
             
+            std::cout<<"key FF = seedMatVector.size()" << seedMatVector.size() <<std::endl;
+            std::cout<<"key FF selectSeedMat = " << selectSeedMat <<std::endl;
         }
         else if(key == 'd') //完成抠图进入下一步，自动旋转旋转
         {
@@ -454,22 +450,20 @@ int main(int argc, char** argv){
             mousePointWidth --;
         }
         else if(key == 'h'){
-        
+            
             for(int i=0;i<(int)seedMatVector.size();i++)
             {
                 char mynum[100];
                 sprintf(mynum, "show %d",i);
                 cv::imshow(mynum, seedMatVector[i]);
             }
-            
+        }
+        else if(key == 'p') //图像后处理，首先要处理得到的抠图blob,将锐利边缘的二值图转换为平滑边缘的，再利用图像融合将锐利边缘的图像与平滑边缘的图像融合，后续需要进行的一个工作
+        {
+        
         }
         else if(key == 'q') //退出
             break;
     }
-    
     return 0;
 }
-
-
-
-
