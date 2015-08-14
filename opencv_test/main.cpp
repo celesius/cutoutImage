@@ -377,7 +377,7 @@ void initSeedMatVector(cv::Size matSize)
 
 int main(int argc, char** argv)
 {
-    cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/4.jpg");
+    cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/2.jpg");
     // cv::imshow("org", img);
     cv::Mat dst = cv::Mat(img.rows,img.cols,CV_8UC1,cv::Scalar(0));
     cv::Mat grayImg;
@@ -425,7 +425,6 @@ int main(int argc, char** argv)
             initSeedMatVector(aSize);
             seedStoreMat = cv::Mat( img.rows, img.cols, CV_8UC1, cv::Scalar(0) );
             cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
-            
         }
         else if(key == 'f') //前进
         {
@@ -433,7 +432,6 @@ int main(int argc, char** argv)
                 selectSeedMat ++;
                 cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
             }
-            
             std::cout<<"key FF = seedMatVector.size()" << seedMatVector.size() <<std::endl;
             std::cout<<"key FF selectSeedMat = " << selectSeedMat <<std::endl;
         }
@@ -460,7 +458,9 @@ int main(int argc, char** argv)
         }
         else if(key == 'p') //图像后处理，首先要处理得到的抠图blob,将锐利边缘的二值图转换为平滑边缘的，再利用图像融合将锐利边缘的图像与平滑边缘的图像融合，后续需要进行的一个工作
         {
-        
+            cv::Mat blobMat = seedMatVector[selectSeedMat];
+            cv::Mat dstMat;
+            cutoutImage->filterImageEdgeAndBlurMerge( img, blobMat, dstMat );
         }
         else if(key == 'q') //退出
             break;

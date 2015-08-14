@@ -23,6 +23,8 @@ public:
     void rotateMat (const cv::Mat srcMat ,cv::Mat &dstMat,const cv::Mat colorMat);
     cv::Mat getMergeResult();
     
+    void filterImageEdgeAndBlurMerge ( const cv::Mat colorMat, const cv::Mat bitMat , cv::Mat &dstMat );
+    
 public:
     cv::Mat classCutMat;
     cv::Mat classMergeMat;
