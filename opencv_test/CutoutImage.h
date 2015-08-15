@@ -25,6 +25,8 @@ public:
     
     void filterImageEdgeAndBlurMerge ( const cv::Mat colorMat, const cv::Mat bitMat , cv::Mat &dstMat );
     
+    void  smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, cv::Mat &dstMat);
+    
 public:
     cv::Mat classCutMat;
     cv::Mat classMergeMat;
@@ -45,6 +47,7 @@ private:
     void colorDispResult(const cv::Mat picMat, cv::Mat cutPicBitMat, cv::Point cutPicAnchorPoint , cv::Mat &mergeColorMat);
     void line2PointSet(const cv::Mat lineMat,std::vector<cv::Point> &pointSet);
     void deleteBlackIsland(const cv::Mat srcBitMat ,cv::Mat &dstBitMat);
+    void makeWhite2Black( const cv::Mat srcMat, cv::Mat &dstMat);
 };
 
 #endif /* defined(__opencv_test__CutoutImage__) */

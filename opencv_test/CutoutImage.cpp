@@ -103,12 +103,12 @@ void CutoutImage::processImageCreatMask( std::vector<cv::Point> mouseSlideRegion
     cv::Mat nextImg = filterImg.clone();
     cv::Mat regionGrowMat;
     CutoutImage::rectRegionGrow( mouseSlideRegion, ltP, filterImg, mouseSlideSeedStoreMat ,regionGrowMat);
-    cv::imshow("regionGrowMat", regionGrowMat);
+   // cv::imshow("regionGrowMat", regionGrowMat);
     cv::Mat mergeMat;
     CutoutImage::mergeProcess(regionGrowMat,mergeMat);
-    cv::imshow("mergeMat", mergeMat);
+   // cv::imshow("mergeMat", mergeMat);
     CutoutImage::storeSeed(seedStoreMat,mergeMat,ltP); // seedStoreMat 需要扣取的mask
-    cv::imshow("seedStoreMat", seedStoreMat);
+   // cv::imshow("seedStoreMat", seedStoreMat);
     //cv::imshow("showMat", showMatClone);
     cv::Mat colorMergeMat;
     CutoutImage::colorDispResultWithFullSeedMat(showMergeColorImg,seedStoreMat);
@@ -209,6 +209,7 @@ bool CutoutImage::regionGrowClover( const cv::Mat srcMat ,cv::Mat &dstMat, int i
 
 bool CutoutImage::regionGrowClover( const cv::Mat srcMat, const cv::Mat seedStoreMat ,cv::Mat &dstMat, int initSeedx, int initSeedy, int threshold) //4邻域生长灰度图生长,传入已有种子点
 {
+    cv::imshow("srcMatregionGrowClover", srcMat);
     bool rState = false;
     std::vector<cv::Point> seedVector;
     cv::Point currentPoint = cv::Point(0,0);
@@ -330,7 +331,7 @@ void CutoutImage::drawLineAndMakePointSet(std::vector<cv::Point> inPoint,cv::Siz
         cv::line(drawLineMat, inPoint[0], inPoint[0], cv::Scalar(255),lineWide);
     }
     CutoutImage::line2PointSet(drawLineMat,pointSet);
-    cv::imshow("drawLineMat", drawLineMat);
+   // cv::imshow("drawLineMat", drawLineMat);
     //colorDraw(drawLineMat,cv::Scalar(255,0,0));
 }
 
@@ -355,7 +356,7 @@ void CutoutImage::mergeProcess(const cv::Mat srcImg,cv::Mat &dstImg)
     //cv::imshow("contours", showContours);
     cv::Mat closeMat;
     cv::morphologyEx(showContours, closeMat, cv::MORPH_CLOSE, cv::Mat(11,11,CV_8U),cv::Point(-1,-1),1);
-    cv::imshow("closeMat", closeMat);
+   // cv::imshow("closeMat", closeMat);
     //cv::medianBlur(closeMat, closeMat,5);
     //因为膨胀和腐蚀带来了一些"孤岛"(断裂的色块)，所以要再做一次背景块去除
     cv::Mat dbCloseMat;
@@ -372,11 +373,11 @@ void CutoutImage::filterImage(const cv::Mat imFrame,cv::Mat & outFrame)
     
     /* Soften image */
     cv::Mat tmpMat;
-    cv::GaussianBlur(imFrame, tmpMat, cv::Size(5,5), 0,0);
+    cv::GaussianBlur(imFrame, tmpMat, cv::Size(7,7), 0,0);
     //myImageShow("Gaussian", tmpMat, cv::Size(640,480));
     //cvSmooth(ctx->image, ctx->temp_image3, CV_GAUSSIAN, 11, 11, 0, 0);
     /* Remove some impulsive noise */
-    cv::medianBlur(tmpMat, tmpMat,1);
+    cv::medianBlur(tmpMat, tmpMat,3);
     //    cvSmooth(ctx->temp_image3, ctx->temp_image3, CV_MEDIAN, 11, 11, 0, 0);
     //cv::cvtColor(tmpMat, tmpMat, CV_BGR2HSV);
     //    cvCvtColor(ctx->temp_image3, ctx->temp_image3, CV_BGR2HSV);
@@ -413,7 +414,7 @@ void CutoutImage::rectRegionGrow( std::vector<cv::Point> seedVector, cv::Point r
     for(int i = 0;i<seedVector.size();i++){
         int seedx = seedVector[i].x - rectMatOrg.x;
         int seedy = seedVector[i].y - rectMatOrg.y;
-        regionGrowClover(srcMat, seedStoreMat, dstMat, seedx, seedy, 5);
+        regionGrowClover(srcMat, seedStoreMat, dstMat, seedx, seedy, 8);
     }
     
 }
@@ -530,7 +531,7 @@ void CutoutImage::colorDispResult(const cv::Mat picMat, cv::Mat cutPicBitMat, cv
     int colorCutPicRows = colorCutPic.rows;
     int colorCutPicCols = colorCutPic.cols*colorCutPic.channels();
     
-    cv::imshow("cutPicBitMat", cutPicBitMat);
+ //   cv::imshow("cutPicBitMat", cutPicBitMat);
     
     for(int y= 0;y<colorCutPicRows;y++ ){
         uchar *cutMatRowsData = colorCutPic.ptr<uchar>(y);
@@ -550,7 +551,7 @@ void CutoutImage::colorDispResult(const cv::Mat picMat, cv::Mat cutPicBitMat, cv
             }
         }
     }
-    cv::imshow("colorCutPicRows", colorCutPic);
+  //  cv::imshow("colorCutPicRows", colorCutPic);
     cv::imshow("showMatColor",showMat);
 }
 
@@ -608,10 +609,14 @@ void CutoutImage::filterImageEdgeAndBlurMerge( const cv::Mat colorMat, const cv:
     int constValue = 10;
     //    cv::adaptiveThreshold( filterMat, filterMat, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY_INV, blockSize, constValue );
     cv::threshold(filterMat, filterMat, 1, 255, CV_THRESH_BINARY );
+    //jiangbo test
+    cv::Mat tmpMMat;
+    //CutoutImage::smoothContours( filterMat, tmpMMat );
+    
     int rows = aBitMat.rows;
     int cols = aBitMat.cols;
     //扣取范围较大的彩色图，并进行模糊，主要需要其边缘部分数据
-    cv::Mat cutBigColorMat = cv::Mat( rows , cols, CV_8UC3, cv::Scalar(0,0,0) );
+    cv::Mat cutBigColorMat = cv::Mat( rows , cols, CV_8UC3, cv::Scalar(255,255,255) );
     for (int y = 0; y < rows; y++) {
         uchar *filterCutMatRowData = filterMat.ptr<uchar>(y);
         uchar *colorMatRowData = aColorMat.ptr<uchar>(y);
@@ -626,6 +631,12 @@ void CutoutImage::filterImageEdgeAndBlurMerge( const cv::Mat colorMat, const cv:
     }
     cv::Mat cutBigColorMatFilter;
     CutoutImage::filterImage(cutBigColorMat, cutBigColorMatFilter);
+   
+    cv::Mat bgrFilterMat;
+    cv::cvtColor(filterMat, bgrFilterMat, CV_GRAY2BGR);
+    CutoutImage::smoothContours(colorMat, bgrFilterMat, tmpMMat);
+    
+    
     cv::Mat fooRusultMat = cv::Mat( rows , cols, CV_8UC3, cv::Scalar(0,0,0) );
     cv::Mat testEdgeData= cv::Mat( rows , cols, CV_8UC3, cv::Scalar(0,0,0) );
     
@@ -723,4 +734,78 @@ void CutoutImage::filterImageEdgeAndBlurMerge( const cv::Mat colorMat, const cv:
     cv::imshow("cutBigColorMatFilter", cutBigColorMatFilter);
     cv::imshow("fooRusultMat", fooRusultMat);
     cv::imshow(" testEdgeData ", testEdgeData);
+}
+
+void CutoutImage::makeWhite2Black( const cv::Mat srcMat, cv::Mat &dstMat)
+{
+    cv::Mat srcMatClone = srcMat.clone();
+    dstMat = cv::Mat(srcMat.size(),CV_8UC3,cv::Scalar(0,0,0));
+    int rows = dstMat.rows;
+    int cols = dstMat.cols;
+
+
+}
+
+void  CutoutImage::smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, cv::Mat &dstMat)
+{
+//    std::vector<std::vector<cv::Point>> contours;
+//    std::vector<std::vector<cv::Point>> smcontours;
+//    cv::Mat aMat = srcMat.clone();
+//    cv::findContours(aMat, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+//    int rows = aMat.rows;
+//    int cols = aMat.cols;
+//    cv::Mat drawMat = cv::Mat( rows, cols, CV_8UC1, cv::Scalar(0));
+//    cv::Mat drawMat2 = cv::Mat( rows, cols, CV_8UC1, cv::Scalar(0));
+//    cv::drawContours(drawMat, contours, -1, cv::Scalar(255));
+//    cv::imshow("smC",drawMat);
+//   
+//    
+//    cv::filter2D(drawMat, drawMat2 , 1, CV_GAUSSIAN);
+////    for (int i = 0; i<contours.size(); i++) {
+////        std::vector<cv::Point> smc;
+////        smcontours.push_back(smc);
+////    }
+//   
+//    //cv::drawContours(drawMat2, smcontours, CV_RETR_EXTERNAL, cv::Scalar(100));
+//    cv::imshow("smC2",drawMat2);
+    
+    
+    //cv::namedWindow("result");
+    cv::Mat img= cutMat.clone();
+//    Mat whole_image=imread("D:\\ImagesForTest\\lena.jpg");
+    cv::Mat whole_image= srcMat.clone();
+    whole_image.convertTo(whole_image,CV_32FC3,1.0/255.0);
+    cv::resize(whole_image,whole_image,img.size());
+    img.convertTo(img,CV_32FC3,1.0/255.0);
+    
+    cv::Mat bg=cv::Mat(img.size(),CV_32FC3);
+    bg=cv::Scalar(1.0,1.0,1.0);
+    
+    // Prepare mask
+    cv::Mat mask;
+    cv::Mat img_gray;
+    cv::cvtColor(img,img_gray,cv::COLOR_BGR2GRAY);
+    img_gray.convertTo(mask,CV_32FC1);
+    threshold(1.0-mask,mask,0.9,1.0,cv::THRESH_BINARY_INV);
+    
+    cv::GaussianBlur(mask,mask,cv::Size(21,21),11.0);
+    cv::imshow("mask",mask);
+    //cv::waitKey(0);
+    
+    // Reget the image fragment with smoothed mask
+    cv::Mat res;
+    
+    std::vector<cv::Mat> ch_img(3);
+    std::vector<cv::Mat> ch_bg(3);
+    cv::split(whole_image,ch_img);
+    cv::split(bg,ch_bg);
+    ch_img[0]=ch_img[0].mul(mask)+ch_bg[0].mul(1.0-mask);
+    ch_img[1]=ch_img[1].mul(mask)+ch_bg[1].mul(1.0-mask);
+    ch_img[2]=ch_img[2].mul(mask)+ch_bg[2].mul(1.0-mask);
+    cv::merge(ch_img,res);
+    cv::merge(ch_bg,bg);
+    
+    cv::imshow("result",res);
+    //cv::waitKey(0);
+    //cv::destroyAllWindows();
 }
