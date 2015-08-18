@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>5F36EE15-B6FA-499C-B067-8806B527DB50</string>
 	<key>IDESourceControlProjectName</key>
-	<string>opencv_test</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>C12DF3A44FE0D275D7786F04D80D230D2BA54670</key>
 		<string>https://github.com/celesius/cutoutImage.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>opencv_test.xcodeproj</string>
+	<string>opencv_test.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>C12DF3A44FE0D275D7786F04D80D230D2BA54670</key>

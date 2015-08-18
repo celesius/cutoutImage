@@ -404,6 +404,20 @@ void CutoutImage::filterImage(const cv::Mat imFrame,cv::Mat & outFrame)
     //cv::GaussianBlur(outFrame, outFrame, cv::Size(3,3), 0,0);
 }
 
+void CutoutImage::filterImageForEdgeBlur(const cv::Mat imFrame,cv::Mat & outFrame)
+{
+    
+    /* Soften image */
+    cv::Mat tmpMat;
+    cv::GaussianBlur(imFrame, tmpMat, cv::Size(21,21), 11.0);
+    /* Remove some impulsive noise */
+    cv::medianBlur(tmpMat, tmpMat,3);
+
+    cv::Mat kernelMat = getStructuringElement(CV_SHAPE_RECT, cv::Size(3,3),cv::Point(2,2));
+    cv::morphologyEx(tmpMat, outFrame, CV_MOP_OPEN,kernelMat);
+    //cv::GaussianBlur(outFrame, outFrame, cv::Size(3,3), 0,0);
+}
+
 void CutoutImage::rectRegionGrow( std::vector<cv::Point> seedVector, cv::Point rectMatOrg, const cv::Mat srcMat, const cv::Mat seedStoreMat , cv::Mat &dstMat)
 {
     int matRow = srcMat.rows;
@@ -594,6 +608,32 @@ void CutoutImage::colorDispResultWithFullSeedMat(const cv::Mat picMat,const cv::
 cv::Mat CutoutImage::getMergeResult(){
     return CutoutImage::classMergeMat;
 }
+
+
+
+void CutoutImage::edgeBlur( const cv::Mat colorMat, const cv::Mat maskMat, int parameter, cv::Mat &dstMat )
+{
+    cv::Mat colorMatClone = colorMat.clone();
+    cv::Mat maskMatClone = maskMat.clone();
+    cv::Mat maskMarClone4smooth = maskMat.clone();
+    cv::Mat bgrMaskMat;
+    cv::cvtColor(maskMatClone, bgrMaskMat, CV_GRAY2BGR);
+    cv::Mat smoothMask;
+    CutoutImage::smoothContours( colorMatClone, bgrMaskMat, parameter,dstMat, smoothMask );
+   
+    cv::Mat tmp;
+    CutoutImage::translucentEdge(dstMat, smoothMask, maskMat,  tmp);
+    
+    /*
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4f> lineVector;
+    cv::findContours(maskMarClone4smooth, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+    cv::Mat drawContoursMat = cv::Mat(maskMarClone4smooth.rows, maskMarClone4smooth.cols, CV_8UC3, cv::Scalar(0,0,0));
+    cv::drawContours(drawContoursMat, contours, -1, cv::Scalar(0,0,255),CV_FILLED);
+   //CutoutImage::smoothContoursAngles()
+    cv::imshow("cccc", drawContoursMat);
+    */
+}
 /*
  将输入的二值图边缘平滑，用锐利边缘抠取输入的彩色图，然后再将彩色图与平滑边缘的图进行融合
  */
@@ -602,8 +642,9 @@ void CutoutImage::filterImageEdgeAndBlurMerge( const cv::Mat colorMat, const cv:
     cv::Mat aBitMat = bitMat.clone();
     cv::Mat aColorMat = colorMat.clone();
     cv::Mat filterMat;
-    CutoutImage::filterImage(aBitMat, filterMat);
-   
+    //CutoutImage::filterImage(aBitMat, filterMat); //使预模糊区域大于正常区域
+    filterMat = aBitMat;  //使预模糊区域与正常区域一样大
+    
     std::cout<<"aColorMat channels =  " <<aColorMat.channels()<<std::endl;
     int blockSize = 5;
     int constValue = 10;
@@ -630,16 +671,19 @@ void CutoutImage::filterImageEdgeAndBlurMerge( const cv::Mat colorMat, const cv:
         }
     }
     cv::Mat cutBigColorMatFilter;
-    CutoutImage::filterImage(cutBigColorMat, cutBigColorMatFilter);
-   
+    //CutoutImage::filterImage(cutBigColorMat, cutBigColorMatFilter);
+    CutoutImage::filterImageForEdgeBlur(cutBigColorMat, cutBigColorMatFilter);
+    
+    
     cv::Mat bgrFilterMat;
     cv::cvtColor(filterMat, bgrFilterMat, CV_GRAY2BGR);
-    CutoutImage::smoothContours(colorMat, bgrFilterMat, tmpMMat);
+    cv::Mat smoothMask;
+    CutoutImage::smoothContours(colorMat, bgrFilterMat, 21 , tmpMMat, smoothMask);
     
     
     cv::Mat fooRusultMat = cv::Mat( rows , cols, CV_8UC3, cv::Scalar(0,0,0) );
     cv::Mat testEdgeData= cv::Mat( rows , cols, CV_8UC3, cv::Scalar(0,0,0) );
-    
+    //融合
     for(int y = 0; y < rows; y++){
         uchar *aBitMatRowData = aBitMat.ptr<uchar>(y);
         uchar *colorMatRowData = aColorMat.ptr<uchar>(y);
@@ -739,38 +783,28 @@ void CutoutImage::filterImageEdgeAndBlurMerge( const cv::Mat colorMat, const cv:
 void CutoutImage::makeWhite2Black( const cv::Mat srcMat, cv::Mat &dstMat)
 {
     cv::Mat srcMatClone = srcMat.clone();
-    dstMat = cv::Mat(srcMat.size(),CV_8UC3,cv::Scalar(0,0,0));
-    int rows = dstMat.rows;
-    int cols = dstMat.cols;
-
-
+    srcMatClone.convertTo(srcMatClone, CV_8UC3 ,255.0);
+    std::cout<< srcMatClone.channels() <<std::endl;
+    //dstMat = cv::Mat(srcMat.size(),CV_8UC3,cv::Scalar(0,0,0));
+    int rows = srcMatClone.rows;
+    int cols = srcMatClone.cols;
+    for(int y = 0; y<rows; y++){
+        uchar *srcMatCloneRowData = srcMatClone.ptr<uchar>(y);
+        //uchar *dstMatRowData = dstMat.ptr<uchar>(y);
+        for (int x = 0; x<cols; x++) {
+            if(srcMatCloneRowData[x*3] == 255 && srcMatCloneRowData[x*3 + 1] == 255  && srcMatCloneRowData[x*3 + 2] == 255)
+            {
+                srcMatCloneRowData[x*3    ] = 0;
+                srcMatCloneRowData[x*3 + 1] = 0;
+                srcMatCloneRowData[x*3 + 2] = 0;
+            }
+        }
+    }
+    dstMat = srcMatClone.clone();
 }
 
-void  CutoutImage::smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, cv::Mat &dstMat)
+void  CutoutImage::smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, int parameter, cv::Mat &dstMat ,cv::Mat &smoothMask)
 {
-//    std::vector<std::vector<cv::Point>> contours;
-//    std::vector<std::vector<cv::Point>> smcontours;
-//    cv::Mat aMat = srcMat.clone();
-//    cv::findContours(aMat, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-//    int rows = aMat.rows;
-//    int cols = aMat.cols;
-//    cv::Mat drawMat = cv::Mat( rows, cols, CV_8UC1, cv::Scalar(0));
-//    cv::Mat drawMat2 = cv::Mat( rows, cols, CV_8UC1, cv::Scalar(0));
-//    cv::drawContours(drawMat, contours, -1, cv::Scalar(255));
-//    cv::imshow("smC",drawMat);
-//   
-//    
-//    cv::filter2D(drawMat, drawMat2 , 1, CV_GAUSSIAN);
-////    for (int i = 0; i<contours.size(); i++) {
-////        std::vector<cv::Point> smc;
-////        smcontours.push_back(smc);
-////    }
-//   
-//    //cv::drawContours(drawMat2, smcontours, CV_RETR_EXTERNAL, cv::Scalar(100));
-//    cv::imshow("smC2",drawMat2);
-    
-    
-    //cv::namedWindow("result");
     cv::Mat img= cutMat.clone();
 //    Mat whole_image=imread("D:\\ImagesForTest\\lena.jpg");
     cv::Mat whole_image= srcMat.clone();
@@ -778,6 +812,7 @@ void  CutoutImage::smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, cv
     cv::resize(whole_image,whole_image,img.size());
     img.convertTo(img,CV_32FC3,1.0/255.0);
     
+    cv::imshow("img",img);
     cv::Mat bg=cv::Mat(img.size(),CV_32FC3);
     bg=cv::Scalar(1.0,1.0,1.0);
     
@@ -788,8 +823,10 @@ void  CutoutImage::smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, cv
     img_gray.convertTo(mask,CV_32FC1);
     threshold(1.0-mask,mask,0.9,1.0,cv::THRESH_BINARY_INV);
     
-    cv::GaussianBlur(mask,mask,cv::Size(21,21),11.0);
+    cv::GaussianBlur(mask,mask,cv::Size(parameter,parameter),11.0);
+    //cv::GaussianBlur(mask, mask, cv::Size(7,7), 11.0);
     cv::imshow("mask",mask);
+    smoothMask = mask.clone();
     //cv::waitKey(0);
     
     // Reget the image fragment with smoothed mask
@@ -805,7 +842,202 @@ void  CutoutImage::smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, cv
     cv::merge(ch_img,res);
     cv::merge(ch_bg,bg);
     
-    cv::imshow("result",res);
+    cv::Mat bg8UC3;
+    
+    bg.convertTo(bg8UC3, CV_8UC3,255);
+    cv::imshow("bg8UC3", bg8UC3);
+   
+    cv::Mat resultMat;
+    CutoutImage::makeWhite2Black( res, resultMat );
+    dstMat = resultMat.clone();
+    //cv::imshow("result",res);
+    //cv::imshow("result2",resultMat);
     //cv::waitKey(0);
     //cv::destroyAllWindows();
 }
+
+/*
+4通道数据希望能达到边缘透明的效果
+ */
+void  CutoutImage::smoothContoursAlphard(const cv::Mat srcMat ,const cv::Mat cutMat, int parameter, cv::Mat &dstMat)
+{
+    cv::Mat img= cutMat.clone();
+//    Mat whole_image=imread("D:\\ImagesForTest\\lena.jpg");
+    cv::Mat whole_image= srcMat.clone();
+    whole_image.convertTo(whole_image,CV_32FC4,1.0/255.0);
+    cv::resize(whole_image,whole_image,img.size());
+    img.convertTo(img,CV_32FC4,1.0/255.0);
+    
+    cv::imshow("img",img);
+    cv::Mat bg=cv::Mat(img.size(),CV_32FC4);
+    bg=cv::Scalar(1.0,1.0,1.0,1.0);
+   
+    
+    // Prepare mask
+    cv::Mat mask;
+    cv::Mat img_gray;
+    cv::cvtColor(img,img_gray,cv::COLOR_BGR2GRAY);
+    img_gray.convertTo(mask,CV_32FC1);
+    threshold(1.0-mask,mask,0.9,1.0,cv::THRESH_BINARY_INV);
+    
+    cv::GaussianBlur(mask,mask,cv::Size(parameter,parameter),11.0);
+    //cv::GaussianBlur(mask, mask, cv::Size(7,7), 11.0);
+    cv::imshow("mask",mask);
+    cv::waitKey(0);
+    
+    // Reget the image fragment with smoothed mask
+    cv::Mat res;
+    
+    std::vector<cv::Mat> ch_img(4);
+    std::vector<cv::Mat> ch_bg(4);
+    cv::split(whole_image,ch_img);
+    cv::split(bg,ch_bg);
+    ch_img[0]=ch_img[0].mul(mask)+ch_bg[0].mul(1.0-mask);
+    ch_img[1]=ch_img[1].mul(mask)+ch_bg[1].mul(1.0-mask);
+    ch_img[2]=ch_img[2].mul(mask)+ch_bg[2].mul(1.0-mask);
+    ch_img[3]=ch_img[3].mul(mask)+ch_bg[3].mul(1.0-mask);
+    cv::merge(ch_img,res);
+    cv::merge(ch_bg,bg);
+    
+    cv::Mat bg8UC4;
+    
+    bg.convertTo(bg8UC4, CV_8UC4,255);
+    cv::imshow("bg8UC4", bg8UC4);
+   
+    cv::Mat resultMat;
+    CutoutImage::makeWhite2Black( res, resultMat );
+    dstMat = resultMat.clone();
+    //cv::imshow("result",res);
+    //cv::imshow("result2",resultMat);
+    //cv::waitKey(0);
+    //cv::destroyAllWindows();
+}
+
+void  CutoutImage::smoothContoursAngles( const std::vector<std::vector<cv::Point>> contoursIn, std::vector<std::vector<cv::Point>> &contoursOut )
+{
+    for(int i = 0; i< (int)contoursIn.size(); i++)
+    {
+        std::vector<cv::Point> currentContours = contoursIn[i];
+        if((int)currentContours.size() > 2) //3个点
+        {
+            for(int j = 0; j < currentContours.size() - 2; j++)
+            {
+                cv::Point firstPoint = currentContours[j];
+                cv::Point secondPoint = currentContours[j+1];
+                cv::Point thirdPoint = currentContours[j+2];
+                cv::Point p1 = cv::Point( (firstPoint.x - secondPoint.x) , -(firstPoint.y - secondPoint.y) );
+                cv::Point p2 = cv::Point( (thirdPoint.x - secondPoint.x) , -(thirdPoint.y - secondPoint.y) );
+                
+                float angle = CutoutImage::angleBetween(p1, p2);
+                
+                if(angle < CV_PI/2)
+                {
+                    contoursOut[i].push_back(secondPoint);
+                }
+            }
+        }
+    }
+}
+//求解两个点之间的夹角
+float CutoutImage::angleBetween(const cv::Point v1, const cv::Point v2)
+{
+    float len1 = sqrt(v1.x * v1.x + v1.y * v1.y);
+    float len2 = sqrt(v2.x * v2.x + v2.y * v2.y);
+    
+    float dot = v1.x * v2.x + v1.y * v2.y;
+    
+    float a = dot / (len1 * len2);
+    
+    if (a >= 1.0)
+        return 0.0;
+    else if (a <= -1.0)
+        return CV_PI;
+    else
+        return acos(a); // 0..PI
+}
+
+void CutoutImage::translucentEdge( const cv::Mat srcMat, const cv::Mat smoothMask, const cv::Mat liteMask, cv::Mat &dstMat ) //liteMask 是边缘模糊之前的数据
+{
+    cv::Mat smoothMask8uc1;
+    smoothMask.convertTo(smoothMask8uc1, CV_8UC1 ,255.0);
+    int rows = smoothMask8uc1.rows;
+    int cols = smoothMask8uc1.cols;
+    //cv::threshold(smoothMask8uc1, bitSmoothMask, 1, 255, CV_THRESH_BINARY );
+    cv::Mat srcMatClone = srcMat.clone();
+    cv::Mat liteMaskClone = liteMask.clone();
+    cv::Mat edgeSmoothMask = cv::Mat( smoothMask.size(), CV_8UC1, cv::Scalar(0));
+    cv::cvtColor(srcMatClone, srcMatClone, CV_BGR2BGRA);
+    for(int y = 0; y < rows; y++){
+        uchar *liteMaskCloneRowData = liteMaskClone.ptr<uchar>(y);
+        uchar *smoothMask8uc1RowData = smoothMask8uc1.ptr<uchar>(y);
+        uchar *srcMatCloneRowData = srcMatClone.ptr<uchar>(y);
+        for (int x = 0; x < cols; x++) {
+            //if(smoothMask8uc1RowData[x] != 0 && liteMaskCloneRowData[x] == 0)
+            //if(smoothMask8uc1RowData[x] != 0 && smoothMask8uc1RowData[x] != 255)
+            {
+                srcMatCloneRowData[x*4 + 3] = smoothMask8uc1RowData[x]/2;
+            }
+        }
+    }
+    cv::imwrite("cc.png", srcMat);
+    cv::imwrite("ccc.png", srcMatClone);
+}
+/*
+void CutoutImage::translucentEdge(const cv::Mat srcMat, cv::Mat liteMask, cv::Mat &dstMat ) //liteMask 是边缘模糊之前的数据
+{
+    int rows = srcMat.rows;
+    int cols = srcMat.cols;
+    cv::Mat srcMatClone = srcMat.clone();
+    cv::Mat orgMaskMatClone = liteMask.clone();
+    cv::Mat colorEdge = cv::Mat(srcMat.size(), CV_8UC4, cv::Scalar(0,0,0,0));  //0是全透明
+    cv::Mat bitEdge = cv::Mat(srcMat.size(), CV_8UC1, cv::Scalar(0));
+    cv::Mat liteMaskClone4FC = liteMask.clone();
+    
+    
+    for(int y = 0; y < rows; y++){
+        uchar *orgMaskMatCloneRowData = orgMaskMatClone.ptr<uchar>(y);
+        uchar *srcMatCloneRowData = srcMatClone.ptr<uchar>(y);
+        uchar *colorEdgeRowData = colorEdge.ptr<uchar>(y);
+        for(int x = 0; x < cols; x++){
+            if(orgMaskMatCloneRowData[x] == 0 && (srcMatCloneRowData[x*3] != 0 || srcMatCloneRowData[x*3 + 1] != 0 || srcMatCloneRowData[x*3 + 2] != 0 )){ //边缘
+            //if(orgMaskMatCloneRowData[x] != 0 ){ //边缘
+                colorEdgeRowData[x*4]     = srcMatCloneRowData[x*3];
+                colorEdgeRowData[x*4 + 1] = srcMatCloneRowData[x*3 + 1];
+                colorEdgeRowData[x*4 + 2] = srcMatCloneRowData[x*3 + 2];
+                colorEdgeRowData[x*4 + 3]     = 255;
+                bitEdge.ptr<uchar>(y)[x] = 255;
+            }
+        }
+    }
+    //cv::cvtColor(colorEdge, colorEdge, CV_BGR2BGRA)
+
+    
+//    
+    std::vector<std::vector<cv::Point>> constours;
+    cv::findContours(bitEdge, constours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+    std::vector<std::vector<cv::Point>> interContours;
+    cv::findContours(liteMaskClone4FC, interContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+   
+    cv::RotatedRect tmp = cv::fitEllipse(constours[0]);
+   
+
+    
+//
+    cv::Mat colorContours = cv::Mat(srcMatClone.size(),CV_8UC3,cv::Scalar(0,0,0));
+    cv::drawContours(colorContours, constours, -1, cv::Scalar(0,0,255));
+    cv::drawContours(colorContours, interContours, -1, cv::Scalar(0,255,255));
+    cv::ellipse(colorContours, tmp, cv::Scalar(255,255,0));
+    cv::circle(colorContours, tmp.center, 5, cv::Scalar(255,255,0),2);
+
+    for(int i = 0;i<constours[0].size();i++)
+    {
+        cv::line(colorContours, tmp.center, constours[0][i], cv::Scalar(255,255,0));
+    }
+    
+//    
+    cv::imshow("colorEdge ", colorEdge);
+    cv::imshow(" colorContours", colorContours);
+//    cv::imshow("colorContours", colorContours);
+    
+}
+*/

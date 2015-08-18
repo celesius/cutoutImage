@@ -18,14 +18,11 @@ public:
     ~CutoutImage();
     void processImageCreatMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth, int expandWidth );  //最后一个参数用于将生成的矩形向外扩展一些
     void processImageDeleteMask(std::vector<cv::Point> mouseSlideRegionDiscrete , cv::Mat &seedStoreMat,const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth );//seedmat将被修改，因为删除了部分内容
-    
     void colorDispResultWithFullSeedMat( const cv::Mat picMat, const cv::Mat seedMat ); //需要这个函数用于外部debug
     void rotateMat (const cv::Mat srcMat ,cv::Mat &dstMat,const cv::Mat colorMat);
     cv::Mat getMergeResult();
-    
     void filterImageEdgeAndBlurMerge ( const cv::Mat colorMat, const cv::Mat bitMat , cv::Mat &dstMat );
-    
-    void  smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, cv::Mat &dstMat);
+    void edgeBlur( const cv::Mat colorMat, const cv::Mat maskMat, int parameter, cv::Mat &dstMat ); //边缘模糊与融合算法
     
 public:
     cv::Mat classCutMat;
@@ -42,12 +39,18 @@ private:
     void drawLineAndMakePointSet(std::vector<cv::Point> inPoint,cv::Size matSize,int lineWide,std::vector<cv::Point> &pointSet);
     void mergeProcess(const cv::Mat srcImg,cv::Mat &dstImg);
     void filterImage(const cv::Mat imFrame,cv::Mat & outFrame);
+    void filterImageForEdgeBlur(const cv::Mat imFrame,cv::Mat & outFrame);
     void rectRegionGrow( std::vector<cv::Point> seedVector, cv::Point rectMatOrg, const cv::Mat srcMat, const cv::Mat seedStoreMat , cv::Mat &dstMat);
     void storeSeed(cv::Mat &storeSeedMat,cv::Mat currentSeedMat,cv::Point cseedMatAnchorPoint);
     void colorDispResult(const cv::Mat picMat, cv::Mat cutPicBitMat, cv::Point cutPicAnchorPoint , cv::Mat &mergeColorMat);
     void line2PointSet(const cv::Mat lineMat,std::vector<cv::Point> &pointSet);
     void deleteBlackIsland(const cv::Mat srcBitMat ,cv::Mat &dstBitMat);
     void makeWhite2Black( const cv::Mat srcMat, cv::Mat &dstMat);
+    void smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, int parameter, cv::Mat &dstMat ,cv::Mat &smoothMask);
+    void smoothContoursAlphard(const cv::Mat srcMat ,const cv::Mat cutMat, int parameter, cv::Mat &dstMat);
+    void smoothContoursAngles( const std::vector<std::vector<cv::Point>> contoursIn, std::vector<std::vector<cv::Point>> &contoursOut );
+    void translucentEdge( const cv::Mat srcMat , const cv::Mat smoothMask, const cv::Mat liteMask, cv::Mat &dstMat );
+    
+    float angleBetween(const cv::Point v1, const cv::Point v2);
 };
-
 #endif /* defined(__opencv_test__CutoutImage__) */

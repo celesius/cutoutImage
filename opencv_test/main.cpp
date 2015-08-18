@@ -460,7 +460,10 @@ int main(int argc, char** argv)
         {
             cv::Mat blobMat = seedMatVector[selectSeedMat];
             cv::Mat dstMat;
-            cutoutImage->filterImageEdgeAndBlurMerge( img, blobMat, dstMat );
+//            cutoutImage->filterImageEdgeAndBlurMerge( img, blobMat, dstMat );
+            cutoutImage->edgeBlur( img, blobMat, 21, dstMat );  //dstMat就是扣取结果，还要对结果进行椭圆拟合和旋转
+            cutoutImage->rotateMat(cutoutImage->classCutMat, mainMat, dstMat);
+            cv::imshow( " cutResult ", dstMat);
         }
         else if(key == 'q') //退出
             break;
