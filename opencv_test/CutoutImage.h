@@ -17,11 +17,11 @@ public:
     CutoutImage();
     ~CutoutImage();
     void processImageCreatMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth, int expandWidth );  //最后一个参数用于将生成的矩形向外扩展一些
+    void processImageAddMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth, const cv::Mat colorMatForShow );  //最后一个参数用于将生成的矩形向外扩展一些
     void processImageDeleteMask(std::vector<cv::Point> mouseSlideRegionDiscrete , cv::Mat &seedStoreMat,const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth );//seedmat将被修改，因为删除了部分内容
     void colorDispResultWithFullSeedMat( const cv::Mat picMat, const cv::Mat seedMat ); //需要这个函数用于外部debug
     void rotateMat (const cv::Mat srcMat ,cv::Mat &dstMat,const cv::Mat colorMat);
     cv::Mat getMergeResult();
-    void filterImageEdgeAndBlurMerge ( const cv::Mat colorMat, const cv::Mat bitMat , cv::Mat &dstMat );
     void edgeBlur( const cv::Mat colorMat, const cv::Mat maskMat, int parameter, cv::Mat &dstMat ); //边缘模糊与融合算法
     
 public:
@@ -47,9 +47,14 @@ private:
     void deleteBlackIsland(const cv::Mat srcBitMat ,cv::Mat &dstBitMat);
     void makeWhite2Black( const cv::Mat srcMat, cv::Mat &dstMat);
     void smoothContours(const cv::Mat srcMat ,const cv::Mat cutMat, int parameter, cv::Mat &dstMat ,cv::Mat &smoothMask);
-    void smoothContoursAlphard(const cv::Mat srcMat ,const cv::Mat cutMat, int parameter, cv::Mat &dstMat);
-    void smoothContoursAngles( const std::vector<std::vector<cv::Point>> contoursIn, std::vector<std::vector<cv::Point>> &contoursOut );
+    void smoothContoursAlphard(const cv::Mat srcMat ,const cv::Mat cutMat, int parameter, cv::Mat &dstMat); //暂不用
+    void smoothContoursAngles( const std::vector<std::vector<cv::Point>> contoursIn, std::vector<std::vector<cv::Point>> &contoursOut ); //赞不用
+    void filterImageEdgeAndBlurMerge ( const cv::Mat colorMat, const cv::Mat bitMat , cv::Mat &dstMat ); //暂不用
     void translucentEdge( const cv::Mat srcMat , const cv::Mat smoothMask, const cv::Mat liteMask, cv::Mat &dstMat );
+    void cutImageByRect(const cv::Mat srcMat, cv::Rect cutRect,cv::Mat &dst);
+   
+    void point2LineMat( const cv::Mat drawMat, std::vector<cv::Point> inPoint, int lineWide, cv::Mat &dstMat );//将输入的点转换为线，画在给定的画布MAT上
+    
     
     float angleBetween(const cv::Point v1, const cv::Point v2);
 };

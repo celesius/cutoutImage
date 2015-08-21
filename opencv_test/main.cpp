@@ -28,6 +28,7 @@ int selectSeedMat = 0;
 std::vector<cv::Mat> seedMatVector;
 int maxSelectSeedMat = 0;
 cv::Mat seedStoreMat;
+bool addMask = false;
 
 //这个用于测试生长算法
 //void on_mouse( int event, int x, int y, int flags, void* param)
@@ -179,45 +180,78 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         mouseSlideRegionDiscrete.push_back(cv::Point(x,y));
     }
     else if(event == CV_EVENT_LBUTTONUP){
-        //drawLine();
-        //std::vector<cv::Point> allSeedPoint;
-        if((int)seedMatVector.size() != 0){ //为0是最开始
-            cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
-            cv::imshow("sendSeedStoreMat", sendSeedStoreMat);
-            cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, sendSeedStoreMat,mousePointWidth,10);
-            seedStoreMat = sendSeedStoreMat;
-        }
-        else{
-            cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, seedStoreMat,mousePointWidth,10);
-        }
-        //这里要存储
-        cv::Mat matWillSave = seedStoreMat.clone();
-        //首先要删除selectSeedMat以后的内容，因为可能返回或者前进
-        if((int)seedMatVector.size() != 0)
-        {
-            for(;;){
-                if( selectSeedMat + 1 == (int)seedMatVector.size() ){
-                    break;
-                }
-                else{
-                    seedMatVector.pop_back();
+        if(addMask == true){
+            if((int)seedMatVector.size() != 0){
+                cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
+                cv::imshow("sendSeedStoreMatA", sendSeedStoreMat);
+                cutoutImage->processImageAddMask( mouseSlideRegionDiscrete, sendSeedStoreMat, seedStoreMat, mousePointWidth, showMat);
+            }
+            else{
+            
+            }
+            cv::Mat matWillSave = seedStoreMat.clone();
+            //首先要删除selectSeedMat以后的内容，因为可能返回或者前进
+            if((int)seedMatVector.size() != 0)
+            {
+                for(;;){
+                    if( selectSeedMat + 1 == (int)seedMatVector.size() ){
+                        break;
+                    }
+                    else{
+                        seedMatVector.pop_back();
+                    }
                 }
             }
+            seedMatVector.push_back(matWillSave);
+            int vCnt = (int)seedMatVector.size();
+            if( vCnt ==  maxSelectSeedMat + 1) //保证只有5个
+            {
+                seedMatVector.erase(seedMatVector.begin()); //删除最开始的mat
+            }
+            selectSeedMat = (int)seedMatVector.size() - 1;
+            mouseSlideRegionDiscrete.clear();
         }
-        seedMatVector.push_back(matWillSave);
-        int vCnt = (int)seedMatVector.size();
-        if( vCnt ==  maxSelectSeedMat + 1) //保证只有5个
-        {
-            seedMatVector.erase(seedMatVector.begin()); //删除最开始的mat
+        else{
+            //drawLine();
+            //std::vector<cv::Point> allSeedPoint;
+            if((int)seedMatVector.size() != 0){ //为0是最开始
+                cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
+                cv::imshow("sendSeedStoreMatC", sendSeedStoreMat);
+                cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, sendSeedStoreMat,mousePointWidth,10);
+                seedStoreMat = sendSeedStoreMat;
+            }
+            else{
+                cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, seedStoreMat,mousePointWidth,10);
+            }
+            //这里要存储
+            cv::Mat matWillSave = seedStoreMat.clone();
+            //首先要删除selectSeedMat以后的内容，因为可能返回或者前进
+            if((int)seedMatVector.size() != 0)
+            {
+                for(;;){
+                    if( selectSeedMat + 1 == (int)seedMatVector.size() ){
+                        break;
+                    }
+                    else{
+                        seedMatVector.pop_back();
+                    }
+                }
+            }
+            seedMatVector.push_back(matWillSave);
+            int vCnt = (int)seedMatVector.size();
+            if( vCnt ==  maxSelectSeedMat + 1) //保证只有5个
+            {
+                seedMatVector.erase(seedMatVector.begin()); //删除最开始的mat
+            }
+            selectSeedMat = (int)seedMatVector.size() - 1; //只要有修改就将selectSeedMat放到修改位置
+            
+            //cv::Mat allShow = cutoutImage->getMergeResult();
+            //cv::imshow("orgGray", allShow);
+            //mouseSlideRegion.clear();
+            mouseSlideRegionDiscrete.clear();
+            std::cout<<"CV_EVENT_LBUTTONUP" <<std::endl;
+            std::cout<<" selectSeedMat =  " << selectSeedMat << std::endl;
         }
-        selectSeedMat = (int)seedMatVector.size() - 1; //只要有修改就将selectSeedMat放到修改位置
-        
-        //cv::Mat allShow = cutoutImage->getMergeResult();
-        //cv::imshow("orgGray", allShow);
-        //mouseSlideRegion.clear();
-        mouseSlideRegionDiscrete.clear();
-        std::cout<<"CV_EVENT_LBUTTONUP" <<std::endl;
-        std::cout<<" selectSeedMat =  " << selectSeedMat << std::endl;
     }
     else if(event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_RBUTTON)){
         mouseSlideRegionDiscrete.push_back(cv::Point(x,y));  //擦除点数据填充
@@ -292,8 +326,6 @@ void on_mouse_cube_color( int event, int x, int y, int flags, void* param)
                 by = mouseSlideRegion[i].y;
             }
             //CvPoint forePtsCvPoint =
-            
-            
         }
         std::cout<<" lx " << lx << " rx " << rx << " ty " << ty << " by " << by <<std::endl;
         cv::Point ltP = cv::Point(lx,ty);
@@ -374,6 +406,28 @@ void initSeedMatVector(cv::Size matSize)
     cv::Mat initZeroMat = cv::Mat(matSize.height,matSize.width,CV_8UC1,cv::Scalar(0));
     seedMatVector.push_back(initZeroMat);
 }
+
+#if 0
+int main(int argc, char** argv)
+{
+    cv::VideoCapture cap;
+    cap.open("/Users/vk/Downloads/EDSH1.mov");
+    cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('A', 'V', 'C', '1'));
+    cv::Mat frame;
+    while (cap.read(frame)) {
+       
+        int fps = cap.get(CV_CAP_PROP_FPS);
+        
+        printf("%d\n",fps);
+        int aa = 1000/fps;
+        cv::imshow("you", frame);
+        
+        int key = cv::waitKey(5);
+        if(key == 'q')
+            break;
+    }
+}
+#endif
 
 int main(int argc, char** argv)
 {
@@ -460,11 +514,21 @@ int main(int argc, char** argv)
         {
             cv::Mat blobMat = seedMatVector[selectSeedMat];
             cv::Mat dstMat;
-//            cutoutImage->filterImageEdgeAndBlurMerge( img, blobMat, dstMat );
             cutoutImage->edgeBlur( img, blobMat, 21, dstMat );  //dstMat就是扣取结果，还要对结果进行椭圆拟合和旋转
             cutoutImage->rotateMat(cutoutImage->classCutMat, mainMat, dstMat);
             cv::imshow( " cutResult ", dstMat);
         }
+        else if(key == 'a') //直接添加mask不用算法
+        {
+            addMask = true;
+            std::cout << "-----直接添加MASK-----" <<std::endl;
+        }
+        else if(key == 'c') //算法计算
+        {
+            addMask = false;
+            std::cout << "-----算法计算MASK-----" <<std::endl;
+        }
+            
         else if(key == 'q') //退出
             break;
     }
