@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5471C0441B5E392400504A37 /* graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5471C03F1B5E37BA00504A37 /* graph.cpp */; };
 		5471C0451B5E392400504A37 /* maxflow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5471C0421B5E37BA00504A37 /* maxflow.cpp */; };
+		54D816E91B8C0B4C0002061D /* CutoutImagePacking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54D816E71B8C0B4C0002061D /* CutoutImagePacking.cpp */; };
 		54F3AE451B6B867000CADB23 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54F3AE431B6B867000CADB23 /* main.cpp */; };
 		54F3B1191B70A6B400CADB23 /* LazySnapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54F3B1171B70A6B400CADB23 /* LazySnapping.cpp */; };
 		54F3B1791B71C64A00CADB23 /* libopencv_calib3d.2.4.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F3B1671B71C64A00CADB23 /* libopencv_calib3d.2.4.9.dylib */; };
@@ -54,6 +55,8 @@
 		5471C0411B5E37BA00504A37 /* instances.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = instances.inc; sourceTree = "<group>"; };
 		5471C0421B5E37BA00504A37 /* maxflow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = maxflow.cpp; sourceTree = "<group>"; };
 		5471C0431B5E37BA00504A37 /* README.TXT */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.TXT; sourceTree = "<group>"; };
+		54D816E71B8C0B4C0002061D /* CutoutImagePacking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CutoutImagePacking.cpp; sourceTree = "<group>"; };
+		54D816E81B8C0B4C0002061D /* CutoutImagePacking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CutoutImagePacking.h; sourceTree = "<group>"; };
 		54F3AE431B6B867000CADB23 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		54F3B1171B70A6B400CADB23 /* LazySnapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LazySnapping.cpp; path = "../maxflow-v3.01/LazySnapping.cpp"; sourceTree = "<group>"; };
 		54F3B1181B70A6B400CADB23 /* LazySnapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LazySnapping.h; path = "../maxflow-v3.01/LazySnapping.h"; sourceTree = "<group>"; };
@@ -163,6 +166,8 @@
 				54F3AE431B6B867000CADB23 /* main.cpp */,
 				54F3B18B1B7334FE00CADB23 /* cvRoundRectangle.cpp */,
 				54F3B18C1B7334FE00CADB23 /* cvRoundRectangle.h */,
+				54D816E71B8C0B4C0002061D /* CutoutImagePacking.cpp */,
+				54D816E81B8C0B4C0002061D /* CutoutImagePacking.h */,
 			);
 			path = opencv_test;
 			sourceTree = "<group>";
@@ -251,6 +256,7 @@
 				5471C0441B5E392400504A37 /* graph.cpp in Sources */,
 				54F3B1901B79939500CADB23 /* CutoutImage.cpp in Sources */,
 				54F3B1191B70A6B400CADB23 /* LazySnapping.cpp in Sources */,
+				54D816E91B8C0B4C0002061D /* CutoutImagePacking.cpp in Sources */,
 				5471C0451B5E392400504A37 /* maxflow.cpp in Sources */,
 				54F3AE451B6B867000CADB23 /* main.cpp in Sources */,
 				54F3B18D1B7334FE00CADB23 /* cvRoundRectangle.cpp in Sources */,

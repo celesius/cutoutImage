@@ -17,12 +17,13 @@
 #include <opencv2/core/core_c.h>
 #include "LazySnapping.h"
 #include "cvRoundRectangle.h"
-#include "CutoutImage.h"
+#include "CutoutImagePacking.h"
 
 //using namespace std;
 
 //cv::Mat classCutMat; //全局抠图结果。存储最终抠图数据，用于椭圆拟合
-CutoutImage *cutoutImage;
+//CutoutImage *cutoutImage;
+CutoutImagePacking *cutoutImagePacking;
 int mousePointWidth = 0;
 int selectSeedMat = 0;
 std::vector<cv::Mat> seedMatVector;
@@ -181,6 +182,10 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
     }
     else if(event == CV_EVENT_LBUTTONUP){
         if(addMask == true){
+            cv::Mat drawMaskResult;
+            cutoutImagePacking->drawMask(mouseSlideRegionDiscrete, mousePointWidth, drawMaskResult);
+            cv::imshow("orgGray", drawMaskResult);
+          /*
             if((int)seedMatVector.size() != 0){
                 cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
                 cv::imshow("sendSeedStoreMatA", sendSeedStoreMat);
@@ -209,11 +214,16 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
                 seedMatVector.erase(seedMatVector.begin()); //删除最开始的mat
             }
             selectSeedMat = (int)seedMatVector.size() - 1;
+            */
             mouseSlideRegionDiscrete.clear();
         }
         else{
+            cv::Mat creatMaskResult;
+            cutoutImagePacking->creatMask(mouseSlideRegionDiscrete, mousePointWidth, creatMaskResult);
+            cv::imshow("orgGray", creatMaskResult);
             //drawLine();
             //std::vector<cv::Point> allSeedPoint;
+            /*
             if((int)seedMatVector.size() != 0){ //为0是最开始
                 cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
                 cv::imshow("sendSeedStoreMatC", sendSeedStoreMat);
@@ -248,6 +258,7 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
             //cv::Mat allShow = cutoutImage->getMergeResult();
             //cv::imshow("orgGray", allShow);
             //mouseSlideRegion.clear();
+            */
             mouseSlideRegionDiscrete.clear();
             std::cout<<"CV_EVENT_LBUTTONUP" <<std::endl;
             std::cout<<" selectSeedMat =  " << selectSeedMat << std::endl;
@@ -259,8 +270,11 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
     else if(event == CV_EVENT_RBUTTONDOWN){
         mouseSlideRegionDiscrete.push_back(cv::Point(x,y));
     }
-    else if(event == CV_EVENT_RBUTTONUP){   //右键抬起
-        
+    else if(event == CV_EVENT_RBUTTONUP){   //右键抬起  删除mark
+        cv::Mat deletMaskResult;
+        cutoutImagePacking->deleteMask(mouseSlideRegionDiscrete, mousePointWidth, deletMaskResult);
+        cv::imshow("orgGray", deletMaskResult);
+        /*
         if((int)seedMatVector.size() != 0){
             seedStoreMat = seedMatVector[selectSeedMat].clone();
         }
@@ -284,6 +298,7 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         }
         //        cv::imshow("orgGray", allShow);
         //        cv::imshow("deleteMat", deleteMat);
+        */
         mouseSlideRegionDiscrete.clear();
         std::cout<<"CV_EVENT_RBUTTONUP" <<std::endl;
         std::cout<<" selectSeedMat =  " << selectSeedMat << std::endl;
@@ -407,28 +422,6 @@ void initSeedMatVector(cv::Size matSize)
     seedMatVector.push_back(initZeroMat);
 }
 
-#if 0
-int main(int argc, char** argv)
-{
-    cv::VideoCapture cap;
-    cap.open("/Users/vk/Downloads/EDSH1.mov");
-    cap.set(CV_CAP_PROP_FOURCC, CV_FOURCC('A', 'V', 'C', '1'));
-    cv::Mat frame;
-    while (cap.read(frame)) {
-       
-        int fps = cap.get(CV_CAP_PROP_FPS);
-        
-        printf("%d\n",fps);
-        int aa = 1000/fps;
-        cv::imshow("you", frame);
-        
-        int key = cv::waitKey(5);
-        if(key == 'q')
-            break;
-    }
-}
-#endif
-
 int main(int argc, char** argv)
 {
     cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/2.jpg");
@@ -438,7 +431,9 @@ int main(int argc, char** argv)
     cv::cvtColor(img, grayImg, CV_BGR2GRAY);
     maxSelectSeedMat = 20;
     mousePointWidth = 10;
-    cutoutImage = new CutoutImage;
+    cutoutImagePacking = new CutoutImagePacking;
+    cutoutImagePacking->setColorImage(img, 20);
+    //cutoutImage = new CutoutImage;  //测试取消
     //初始化seedMatVector;
     cv::Size aSize;
     aSize.width = img.cols;
@@ -466,32 +461,47 @@ int main(int argc, char** argv)
         int key = cv::waitKey(2);
         if(key =='b') //回退
         {
+            cv::Mat redoMat;
+            cutoutImagePacking->redo(redoMat);
+            cv::imshow("orgGray", redoMat);
+            /*
             if((int)seedMatVector.size() != 0 && selectSeedMat != 0)  //
             {
                 selectSeedMat --;
                 cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
             }
+            */
             std::cout<<"key BB selectSeedMat = " << selectSeedMat <<std::endl;
         }
         else if(key == 'r') //重做
         {
+            cv::Mat resetMat;
+            cutoutImagePacking->resetMask(resetMat);
+            cv::imshow("orgGray", resetMat);
+            /*
             selectSeedMat = 0;
             initSeedMatVector(aSize);
             seedStoreMat = cv::Mat( img.rows, img.cols, CV_8UC1, cv::Scalar(0) );
             cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
+            */
         }
         else if(key == 'f') //前进
         {
+            cv::Mat undoMat;
+            cutoutImagePacking->undo(undoMat);
+            cv::imshow("orgGray", undoMat);
+            /*
             if( selectSeedMat !=  maxSelectSeedMat - 1 && selectSeedMat != seedMatVector.size() - 1 ){
                 selectSeedMat ++;
                 cutoutImage->colorDispResultWithFullSeedMat(grayImg, seedMatVector[selectSeedMat]);
             }
+             */
             std::cout<<"key FF = seedMatVector.size()" << seedMatVector.size() <<std::endl;
             std::cout<<"key FF selectSeedMat = " << selectSeedMat <<std::endl;
         }
         else if(key == 'd') //完成抠图进入下一步，自动旋转旋转
         {
-            cutoutImage->rotateMat(cutoutImage->classCutMat, mainMat,img);
+            //cutoutImage->rotateMat(cutoutImage->classCutMat, mainMat,img);
         }
         else if(key == '=')
         {
@@ -512,10 +522,14 @@ int main(int argc, char** argv)
         }
         else if(key == 'p') //图像后处理，首先要处理得到的抠图blob,将锐利边缘的二值图转换为平滑边缘的，再利用图像融合将锐利边缘的图像与平滑边缘的图像融合，后续需要进行的一个工作
         {
+            cv::Mat dstMat;
+            dstMat = cutoutImagePacking->getFinalColorMergeImg();
+            /*
             cv::Mat blobMat = seedMatVector[selectSeedMat];
             cv::Mat dstMat;
             cutoutImage->edgeBlur( img, blobMat, 21, dstMat );  //dstMat就是扣取结果，还要对结果进行椭圆拟合和旋转
             cutoutImage->rotateMat(cutoutImage->classCutMat, mainMat, dstMat);
+            */
             cv::imshow( " cutResult ", dstMat);
         }
         else if(key == 'a') //直接添加mask不用算法
