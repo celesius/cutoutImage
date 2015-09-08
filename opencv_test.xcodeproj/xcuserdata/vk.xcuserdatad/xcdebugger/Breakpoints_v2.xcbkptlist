@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189276.995146"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "857"
-            endingLineNumber = "857"
+            startingLineNumber = "777"
+            endingLineNumber = "777"
             landmarkName = "main(int argc, char** argv)"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189276.995146"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "925"
-            endingLineNumber = "925"
+            startingLineNumber = "845"
+            endingLineNumber = "845"
             landmarkName = "main(int argc, char** argv)"
             landmarkType = "7">
          </BreakpointContent>
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189276.995146"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "936"
-            endingLineNumber = "936"
+            startingLineNumber = "856"
+            endingLineNumber = "856"
             landmarkName = "main(int argc, char** argv)"
             landmarkType = "7">
          </BreakpointContent>
@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189276.995146"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "976"
-            endingLineNumber = "976"
+            startingLineNumber = "896"
+            endingLineNumber = "896"
             landmarkName = "main(int argc, char** argv)"
             landmarkType = "7">
          </BreakpointContent>
@@ -90,11 +90,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189276.995146"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1001"
-            endingLineNumber = "1001"
+            startingLineNumber = "921"
+            endingLineNumber = "921"
             landmarkName = "main(int argc, char** argv)"
             landmarkType = "7">
          </BreakpointContent>
@@ -106,11 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189276.995146"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1002"
-            endingLineNumber = "1002"
+            startingLineNumber = "922"
+            endingLineNumber = "922"
             landmarkName = "main(int argc, char** argv)"
             landmarkType = "7">
          </BreakpointContent>
@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189127.841103"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "275"
-            endingLineNumber = "275"
+            startingLineNumber = "218"
+            endingLineNumber = "218"
             landmarkName = "on_mouse_cube( int event, int x, int y, int flags, void* param)"
             landmarkType = "7">
          </BreakpointContent>
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462180777.711892"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "148"
-            endingLineNumber = "148"
+            startingLineNumber = "151"
+            endingLineNumber = "151"
             landmarkName = "rectLazySnapping( std::vector&lt;cv::Point&gt; seedVector, cv::Point rectMatOrg, const cv::Mat srcMat, cv::Mat &amp;dstMat )"
             landmarkType = "7">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462180777.711892"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "77"
-            endingLineNumber = "77"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
             landmarkName = "imageProcessingLS( const cv::Mat srcImage )"
             landmarkType = "7">
          </BreakpointContent>
@@ -170,11 +170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462180777.711892"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "84"
-            endingLineNumber = "84"
+            startingLineNumber = "87"
+            endingLineNumber = "87"
             landmarkName = "imageProcessingLS( const cv::Mat srcImage )"
             landmarkType = "7">
          </BreakpointContent>
@@ -234,11 +234,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189276.995146"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "511"
-            endingLineNumber = "511"
+            startingLineNumber = "431"
+            endingLineNumber = "431"
             landmarkName = "main(int argc, char** argv)"
             landmarkType = "7">
          </BreakpointContent>
@@ -250,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/main.cpp"
-            timestampString = "462189127.841103"
+            timestampString = "463292025.455226"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "266"
-            endingLineNumber = "266"
+            startingLineNumber = "209"
+            endingLineNumber = "209"
             landmarkName = "on_mouse_cube( int event, int x, int y, int flags, void* param)"
             landmarkType = "7">
          </BreakpointContent>
@@ -266,12 +266,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/CutoutImage.cpp"
-            timestampString = "462186626.693543"
+            timestampString = "463290116.28175"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "796"
-            endingLineNumber = "796"
-            landmarkName = "CutoutImage::makeWhite2Black( const cv::Mat srcMat, cv::Mat &amp;dstMat)"
+            startingLineNumber = "809"
+            endingLineNumber = "809"
+            landmarkName = "CutoutImage::filterImageEdgeAndBlurMerge( const cv::Mat colorMat, const cv::Mat bitMat, cv::Mat &amp;dstMat )"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -282,11 +282,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/CutoutImage.cpp"
-            timestampString = "462186626.693543"
+            timestampString = "463290116.28175"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "804"
-            endingLineNumber = "804"
+            startingLineNumber = "817"
+            endingLineNumber = "817"
             landmarkName = "CutoutImage::makeWhite2Black( const cv::Mat srcMat, cv::Mat &amp;dstMat)"
             landmarkType = "5">
          </BreakpointContent>
@@ -298,11 +298,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/CutoutImagePacking.cpp"
-            timestampString = "462189467.849792"
+            timestampString = "463301633.408409"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "148"
-            endingLineNumber = "148"
+            startingLineNumber = "153"
+            endingLineNumber = "153"
             landmarkName = "CutoutImagePacking::redo( cv::Mat &amp; dstMat)"
             landmarkType = "5">
          </BreakpointContent>
@@ -314,12 +314,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv_test/CutoutImagePacking.cpp"
-            timestampString = "462189592.686725"
+            timestampString = "463301633.408409"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "144"
-            endingLineNumber = "144"
+            startingLineNumber = "149"
+            endingLineNumber = "149"
             landmarkName = "CutoutImagePacking::redo( cv::Mat &amp; dstMat)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "opencv_test/CloverGrabCut.cpp"
+            timestampString = "463396339.275687"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "302"
+            endingLineNumber = "302"
+            landmarkName = "CloverGrabCut::scaleImg(const cv::Mat srcMat, float scaleLevel, cv::Mat &amp;dstMat)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

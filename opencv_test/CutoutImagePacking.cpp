@@ -3,7 +3,7 @@
 //  opencv_test
 //
 //  Created by vk on 15/8/25.
-//  Copyright (c) 2015年 leisheng526. All rights reserved.
+//  Copyright (c) 2015年 clover. All rights reserved.
 //
 
 #include "CutoutImagePacking.h"
@@ -15,6 +15,7 @@ CutoutImagePacking::CutoutImagePacking()
     CutoutImagePacking::seedMatVector.clear();
     CutoutImagePacking::selectSeedMat = 0;
     CutoutImagePacking::maskColor = cv::Scalar(0,0,0);
+    _numOfAlgorithm = 2;
 }
 
 CutoutImagePacking::~CutoutImagePacking()
@@ -35,6 +36,7 @@ void CutoutImagePacking::setColorImage( cv::Mat srcMat, int maxSeedMatNum )
     cv::Mat zero = seedStoreMat.clone();
     CutoutImagePacking::seedMatVector.push_back(zero);
     maxSelectSeedMat = maxSeedMatNum;
+    cutoutImage->setColorImg(srcMat);
 }
 
 void CutoutImagePacking::setMaskColor(cv::Scalar inputMaskColor)
@@ -76,7 +78,12 @@ void CutoutImagePacking::creatMask( std::vector<cv::Point> selectPoint, int line
     if((int)seedMatVector.size() != 0){ //为0是最开始
         cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
         cv::imshow("sendSeedStoreMatC", sendSeedStoreMat);
+        if(_numOfAlgorithm == 1 ){
         cutoutImage->processImageCreatMask( selectPoint, srcColorImg, sendSeedStoreMat, lineWidth,10 );
+        }
+        else if(_numOfAlgorithm == 2){
+            cutoutImage->processImageCreatMaskByGrabcut(selectPoint, srcColorImg, sendSeedStoreMat, lineWidth);
+        }
         drawResult = cutoutImage->getMergeResult();
         seedStoreMat = sendSeedStoreMat;
     }
@@ -210,3 +217,10 @@ cv::Mat CutoutImagePacking::getFinalColorMergeImg()
     
     return dstMat;
 }
+
+
+void CutoutImagePacking::selectAlgorithm(int num)
+{
+    _numOfAlgorithm = num;
+}
+

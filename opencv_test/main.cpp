@@ -3,7 +3,7 @@
 //  opencv_test
 //
 //  Created by vk on 15/7/31.
-//  Copyright (c) 2015年 leisheng526. All rights reserved.
+//  Copyright (c) 2015年 clover. All rights reserved.
 //
 
 //#include "main.h"
@@ -30,6 +30,9 @@ std::vector<cv::Mat> seedMatVector;
 int maxSelectSeedMat = 0;
 cv::Mat seedStoreMat;
 bool addMask = false;
+bool ldrag = false;
+cv::Mat dsplayMat;
+cv::Mat colorSrcMat;;
 
 //这个用于测试生长算法
 //void on_mouse( int event, int x, int y, int flags, void* param)
@@ -157,108 +160,48 @@ void cannyAndShow(const cv::Mat matWillShow)
 }
 
 //这个用于测试局部算法
+cv::Point lastPoint;
+cv::Point currentPoint;
 void on_mouse_cube( int event, int x, int y, int flags, void* param)
 {
     //首先要记录滑动区域并统计计算窗口大小
     cv::Mat showMat = cv::Mat((IplImage *)param,true);
     cv::Mat showMatClone = showMat.clone(); //用于画点，画线显示用
-    //cv::Mat showMergeColorImg = showMat.clone();
     cv::Mat shoMatMouse = showMat.clone();
-    //static cv::Mat seedStoreMat = cv::Mat( showMat.rows, showMat.cols, CV_8UC1, cv::Scalar(0) );
-    //static cv::Mat allShow ;//= showMat.clone();
     forePts.clear();
     std::vector<cv::Point> static mouseSlideRegionDiscrete;
     cv::circle(shoMatMouse, cv::Point(x,y), mousePointWidth/2, cv::Scalar(0));
-    //cv::imshow("shoMatMouse", shoMatMouse);
-    //std::vector<cv::Point> static mouseSlideRegion; //鼠标按下滑动区域
+   
+   
+    currentPoint = cv::Point(x,y);
     if(event == CV_EVENT_MOUSEMOVE && (flags & CV_EVENT_FLAG_LBUTTON)){  //按下左键并移动
         //if(event == (CV_EVENT_MOUSEMOVE && CV_EVENT_FLAG_LBUTTON)){
         mouseSlideRegionDiscrete.push_back(cv::Point(x,y));
+        cv::line(dsplayMat , lastPoint, currentPoint, cv::Scalar(0,0,255),mousePointWidth);
+        cv::imshow("orgGray", dsplayMat);
+        lastPoint = currentPoint;
         //7*7种子点
     }
     else if(event == CV_EVENT_LBUTTONDOWN)
     {
+        ldrag = true;
+        currentPoint = cv::Point(x,y);
         mouseSlideRegionDiscrete.push_back(cv::Point(x,y));
+        lastPoint = currentPoint;
     }
     else if(event == CV_EVENT_LBUTTONUP){
+        dsplayMat = colorSrcMat.clone();
+        ldrag = false;
         if(addMask == true){
             cv::Mat drawMaskResult;
             cutoutImagePacking->drawMask(mouseSlideRegionDiscrete, mousePointWidth, drawMaskResult);
             cv::imshow("orgGray", drawMaskResult);
-          /*
-            if((int)seedMatVector.size() != 0){
-                cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
-                cv::imshow("sendSeedStoreMatA", sendSeedStoreMat);
-                cutoutImage->processImageAddMask( mouseSlideRegionDiscrete, sendSeedStoreMat, seedStoreMat, mousePointWidth, showMat);
-            }
-            else{
-            
-            }
-            cv::Mat matWillSave = seedStoreMat.clone();
-            //首先要删除selectSeedMat以后的内容，因为可能返回或者前进
-            if((int)seedMatVector.size() != 0)
-            {
-                for(;;){
-                    if( selectSeedMat + 1 == (int)seedMatVector.size() ){
-                        break;
-                    }
-                    else{
-                        seedMatVector.pop_back();
-                    }
-                }
-            }
-            seedMatVector.push_back(matWillSave);
-            int vCnt = (int)seedMatVector.size();
-            if( vCnt ==  maxSelectSeedMat + 1) //保证只有5个
-            {
-                seedMatVector.erase(seedMatVector.begin()); //删除最开始的mat
-            }
-            selectSeedMat = (int)seedMatVector.size() - 1;
-            */
             mouseSlideRegionDiscrete.clear();
         }
         else{
             cv::Mat creatMaskResult;
             cutoutImagePacking->creatMask(mouseSlideRegionDiscrete, mousePointWidth, creatMaskResult);
             cv::imshow("orgGray", creatMaskResult);
-            //drawLine();
-            //std::vector<cv::Point> allSeedPoint;
-            /*
-            if((int)seedMatVector.size() != 0){ //为0是最开始
-                cv::Mat sendSeedStoreMat = seedMatVector[selectSeedMat].clone();  //这个一定要注意否则就把当前拿出的mat修改了
-                cv::imshow("sendSeedStoreMatC", sendSeedStoreMat);
-                cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, sendSeedStoreMat,mousePointWidth,10);
-                seedStoreMat = sendSeedStoreMat;
-            }
-            else{
-                cutoutImage->processImageCreatMask(mouseSlideRegionDiscrete, showMat, seedStoreMat,mousePointWidth,10);
-            }
-            //这里要存储
-            cv::Mat matWillSave = seedStoreMat.clone();
-            //首先要删除selectSeedMat以后的内容，因为可能返回或者前进
-            if((int)seedMatVector.size() != 0)
-            {
-                for(;;){
-                    if( selectSeedMat + 1 == (int)seedMatVector.size() ){
-                        break;
-                    }
-                    else{
-                        seedMatVector.pop_back();
-                    }
-                }
-            }
-            seedMatVector.push_back(matWillSave);
-            int vCnt = (int)seedMatVector.size();
-            if( vCnt ==  maxSelectSeedMat + 1) //保证只有5个
-            {
-                seedMatVector.erase(seedMatVector.begin()); //删除最开始的mat
-            }
-            selectSeedMat = (int)seedMatVector.size() - 1; //只要有修改就将selectSeedMat放到修改位置
-            
-            //cv::Mat allShow = cutoutImage->getMergeResult();
-            //cv::imshow("orgGray", allShow);
-            //mouseSlideRegion.clear();
-            */
             mouseSlideRegionDiscrete.clear();
             std::cout<<"CV_EVENT_LBUTTONUP" <<std::endl;
             std::cout<<" selectSeedMat =  " << selectSeedMat << std::endl;
@@ -274,31 +217,6 @@ void on_mouse_cube( int event, int x, int y, int flags, void* param)
         cv::Mat deletMaskResult;
         cutoutImagePacking->deleteMask(mouseSlideRegionDiscrete, mousePointWidth, deletMaskResult);
         cv::imshow("orgGray", deletMaskResult);
-        /*
-        if((int)seedMatVector.size() != 0){
-            seedStoreMat = seedMatVector[selectSeedMat].clone();
-        }
-        else{
-            seedStoreMat = cv::Mat(showMat.rows,showMat.cols,CV_8UC1,cv::Scalar(0));
-        }
-        
-        cv::Mat emptyMat;
-        cutoutImage->processImageDeleteMask(mouseSlideRegionDiscrete,seedStoreMat,showMat,emptyMat,mousePointWidth);
-        
-        if((int)seedMatVector.size() != 0)  //若已经生成过计算结果
-        {
-            cv::Mat matWillBeStore = seedStoreMat.clone();
-            seedMatVector.push_back(matWillBeStore);
-            int vCnt = (int)seedMatVector.size();
-            if( vCnt == maxSelectSeedMat + 1 ) //保证只有设置的最大数量
-            {
-                seedMatVector.erase(seedMatVector.begin());
-            }
-            selectSeedMat = (int)seedMatVector.size() - 1;
-        }
-        //        cv::imshow("orgGray", allShow);
-        //        cv::imshow("deleteMat", deleteMat);
-        */
         mouseSlideRegionDiscrete.clear();
         std::cout<<"CV_EVENT_RBUTTONUP" <<std::endl;
         std::cout<<" selectSeedMat =  " << selectSeedMat << std::endl;
@@ -424,7 +342,9 @@ void initSeedMatVector(cv::Size matSize)
 
 int main(int argc, char** argv)
 {
-    cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/2.jpg");
+    cv::Mat img = cv::imread("/Users/vk/Pictures/SkinColorImg/texture/4.jpg");
+    dsplayMat = img.clone();
+    colorSrcMat = img.clone();
     // cv::imshow("org", img);
     cv::Mat dst = cv::Mat(img.rows,img.cols,CV_8UC1,cv::Scalar(0));
     cv::Mat grayImg;
@@ -450,7 +370,7 @@ int main(int argc, char** argv)
     IplImage send2OnMouse = growSrc;
     psend2OnMouse = &send2OnMouse;
     //send2OnMouse= IplImage(grayImg);
-    cv::imshow("orgGray", growSrc);
+    cv::imshow("orgGray", dsplayMat );
     //cannyAndShow(grayImg);
     //cvSetMouseCallback( "orgGray", on_mouse_cube_color, (void *)psend2OnMouse);
     cvSetMouseCallback( "orgGray", on_mouse_cube, (void *)psend2OnMouse);

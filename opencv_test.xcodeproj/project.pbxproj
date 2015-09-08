@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		54318C721B9C273700A16E21 /* CloverGrabCut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54318C701B9C273700A16E21 /* CloverGrabCut.cpp */; };
 		5471C0441B5E392400504A37 /* graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5471C03F1B5E37BA00504A37 /* graph.cpp */; };
 		5471C0451B5E392400504A37 /* maxflow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5471C0421B5E37BA00504A37 /* maxflow.cpp */; };
 		54D816E91B8C0B4C0002061D /* CutoutImagePacking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54D816E71B8C0B4C0002061D /* CutoutImagePacking.cpp */; };
@@ -48,6 +49,8 @@
 
 /* Begin PBXFileReference section */
 		541B8BE51B58DCDE00BE0C22 /* hand.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hand.JPG; sourceTree = "<group>"; };
+		54318C701B9C273700A16E21 /* CloverGrabCut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CloverGrabCut.cpp; sourceTree = "<group>"; };
+		54318C711B9C273700A16E21 /* CloverGrabCut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloverGrabCut.h; sourceTree = "<group>"; };
 		5471C03D1B5E37BA00504A37 /* block.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = block.h; sourceTree = "<group>"; };
 		5471C03E1B5E37BA00504A37 /* CHANGES.TXT */ = {isa = PBXFileReference; lastKnownFileType = text; path = CHANGES.TXT; sourceTree = "<group>"; };
 		5471C03F1B5E37BA00504A37 /* graph.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = graph.cpp; sourceTree = "<group>"; };
@@ -168,6 +171,8 @@
 				54F3B18C1B7334FE00CADB23 /* cvRoundRectangle.h */,
 				54D816E71B8C0B4C0002061D /* CutoutImagePacking.cpp */,
 				54D816E81B8C0B4C0002061D /* CutoutImagePacking.h */,
+				54318C701B9C273700A16E21 /* CloverGrabCut.cpp */,
+				54318C711B9C273700A16E21 /* CloverGrabCut.h */,
 			);
 			path = opencv_test;
 			sourceTree = "<group>";
@@ -258,6 +263,7 @@
 				54F3B1191B70A6B400CADB23 /* LazySnapping.cpp in Sources */,
 				54D816E91B8C0B4C0002061D /* CutoutImagePacking.cpp in Sources */,
 				5471C0451B5E392400504A37 /* maxflow.cpp in Sources */,
+				54318C721B9C273700A16E21 /* CloverGrabCut.cpp in Sources */,
 				54F3AE451B6B867000CADB23 /* main.cpp in Sources */,
 				54F3B18D1B7334FE00CADB23 /* cvRoundRectangle.cpp in Sources */,
 			);

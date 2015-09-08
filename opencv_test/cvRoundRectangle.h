@@ -3,7 +3,7 @@
 //  opencv_test
 //
 //  Created by vk on 15/8/6.
-//  Copyright (c) 2015年 leisheng526. All rights reserved.
+//  Copyright (c) 2015年 clover. All rights reserved.
 //
 
 #ifndef __opencv_test__cvRoundRectangle__

@@ -11,11 +11,13 @@
 
 #include <stdio.h>
 #include <opencv2/opencv.hpp>
+#include "CloverGrabCut.h"
 
 class CutoutImage{
 public:
     CutoutImage();
     ~CutoutImage();
+    void processImageCreatMaskByGrabcut(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth);
     void processImageCreatMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth, int expandWidth );  //最后一个参数用于将生成的矩形向外扩展一些
     void processImageAddMask(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth, const cv::Mat colorMatForShow );  //最后一个参数用于将生成的矩形向外扩展一些
     void processImageDeleteMask(std::vector<cv::Point> mouseSlideRegionDiscrete , cv::Mat &seedStoreMat,const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth );//seedmat将被修改，因为删除了部分内容
@@ -23,6 +25,7 @@ public:
     void rotateMat (const cv::Mat srcMat ,cv::Mat &dstMat,const cv::Mat colorMat);
     cv::Mat getMergeResult();
     void edgeBlur( const cv::Mat colorMat, const cv::Mat maskMat, int parameter, cv::Mat &dstMat ); //边缘模糊与融合算法
+    void setColorImg(cv::Mat colorImg);
     
 public:
     cv::Mat classCutMat;
@@ -37,6 +40,7 @@ private:
     bool regionGrowClover( const cv::Mat srcMat ,cv::Mat &dstMat, int initSeedx, int initSeedy, int threshold);
     bool regionGrowClover( const cv::Mat srcMat, const cv::Mat seedStoreMat ,cv::Mat &dstMat, int initSeedx, int initSeedy, int threshold);
     void drawLineAndMakePointSet(std::vector<cv::Point> inPoint,cv::Size matSize,int lineWide,std::vector<cv::Point> &pointSet);
+    
     void mergeProcess(const cv::Mat srcImg,cv::Mat &dstImg);
     void filterImage(const cv::Mat imFrame,cv::Mat & outFrame);
     void filterImageForEdgeBlur(const cv::Mat imFrame,cv::Mat & outFrame);
@@ -54,7 +58,8 @@ private:
     void cutImageByRect(const cv::Mat srcMat, cv::Rect cutRect,cv::Mat &dst);
    
     void point2LineMat( const cv::Mat drawMat, std::vector<cv::Point> inPoint, int lineWide, cv::Mat &dstMat );//将输入的点转换为线，画在给定的画布MAT上
-    
+   
+    CloverGrabCut *_cloverGrabCut;
     
     float angleBetween(const cv::Point v1, const cv::Point v2);
 };

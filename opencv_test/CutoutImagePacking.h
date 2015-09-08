@@ -3,7 +3,7 @@
 //  opencv_test
 //
 //  Created by vk on 15/8/25.
-//  Copyright (c) 2015年 leisheng526. All rights reserved.
+//  Copyright (c) 2015年 clover. All rights reserved.
 //
 
 #ifndef __opencv_test__CutoutImagePacking__
@@ -31,6 +31,8 @@ public:
     cv::Mat getCurrenrColorMergeImg();                                                  //输出当前的融合结果
     cv::Mat getFinalBitCutMask();
     cv::Mat getFinalColorMergeImg();
+    
+    void selectAlgorithm(int num);  //算法选择模块
 private:
     CutoutImage *cutoutImage;
     cv::Mat srcColorImg;
@@ -40,6 +42,7 @@ private:
     int selectSeedMat;
     int maxSelectSeedMat;
     cv::Scalar maskColor;
+    int _numOfAlgorithm;
     
 };
 

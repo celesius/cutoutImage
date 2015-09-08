@@ -11,11 +11,30 @@
 CutoutImage::CutoutImage()
 {
     CutoutImage::classCutMat = *new cv::Mat;
+    _cloverGrabCut = new CloverGrabCut;
 
 }
 
 CutoutImage::~CutoutImage()
 {
+
+}
+
+void CutoutImage::setColorImg(cv::Mat colorImg)
+{
+    _cloverGrabCut->setImage(colorImg);
+}
+
+void CutoutImage::processImageCreatMaskByGrabcut(std::vector<cv::Point> mouseSlideRegionDiscrete , const cv::Mat srcMat, cv::Mat &dstMat , int lineWidth)
+{
+    mouseSlideRegion.clear();
+    cv::Size matSize = cv::Size(srcMat.cols, srcMat.rows);
+    cv::Mat resultColorMat;
+    cv::Mat showMergeColorImg = srcMat.clone();
+    _cloverGrabCut->processGrabCut(mouseSlideRegionDiscrete, lineWidth, dstMat, resultColorMat);
+    CutoutImage::colorDispResultWithFullSeedMat(showMergeColorImg,dstMat);
+    cv::imshow("dstMat", dstMat);
+    //CutoutImage::drawLineAndMakePointSet(mouseSlideRegionDiscrete,matSize,lineWidth,mouseSlideRegion);
 
 }
 
@@ -373,15 +392,18 @@ void CutoutImage::deleteBlackIsland(const cv::Mat srcBitMat ,cv::Mat &dstBitMat)
 void CutoutImage::mergeProcess(const cv::Mat srcImg,cv::Mat &dstImg)
 {
     cv::Mat a_mat = srcImg.clone();
+    cv::imshow("!!!!!!!!", srcImg.clone());
     cv::Mat showContours = cv::Mat(a_mat.rows,a_mat.cols,CV_8UC1,cv::Scalar(0));
     //cv::Mat showContours = cv::Mat(srcImg.rows,srcImg.cols,CV_8UC4,cv::Scalar(0,0,0,0));
     std::vector<std::vector<cv::Point>> contours;
     std::vector<std::vector<cv::Point>> hiararchy;
     cv::findContours(a_mat, contours, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_NONE);
     cv::drawContours(showContours, contours, -1, cv::Scalar(255),CV_FILLED);
+    cv::imshow("iiiiiiiii", showContours);
     //cv::imshow("contours", showContours);
     cv::Mat closeMat;
-    cv::morphologyEx(showContours, closeMat, cv::MORPH_CLOSE, cv::Mat(11,11,CV_8U),cv::Point(-1,-1),1);
+    cv::morphologyEx(showContours, closeMat, cv::MORPH_CLOSE, cv::Mat(11,11,CV_8U));
+    cv::imshow("+++++++++", closeMat);
    // cv::imshow("closeMat", closeMat);
     //cv::medianBlur(closeMat, closeMat,5);
     //因为膨胀和腐蚀带来了一些"孤岛"(断裂的色块)，所以要再做一次背景块去除
